@@ -1,6 +1,6 @@
 {
-  "name": "gvg-os",
-  "version": "3.0.0",
+  "name": "gvg-os-v1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
