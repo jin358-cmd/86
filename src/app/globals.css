@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  --gvg-yellow: #fcee0a;
+  --gvg-bg: #080808;
+  --gvg-panel: #111111;
+  --gvg-cyan: #00e5ff;
+  --gvg-danger: #ff1744;
+  --gvg-text: #ececec;
+  --gvg-muted: #8b8b8b;
+}
+
+@theme inline {
+  --color-gvg-yellow: var(--gvg-yellow);
+  --color-gvg-bg: var(--gvg-bg);
+  --color-gvg-panel: var(--gvg-panel);
+  --color-gvg-cyan: var(--gvg-cyan);
+  --color-gvg-danger: var(--gvg-danger);
+  --color-gvg-text: var(--gvg-text);
+  --color-gvg-muted: var(--gvg-muted);
+  --font-display: var(--font-orbitron);
+  --font-hud: var(--font-rajdhani);
+  --font-mono: var(--font-jetbrains);
+  --font-body: var(--font-space);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--gvg-bg);
+  color: var(--gvg-text);
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--gvg-yellow) 35%, transparent);
+  color: #000;
+}
+
+.font-display {
+  font-family: var(--font-display), sans-serif;
+}
+
+.font-hud {
+  font-family: var(--font-hud), sans-serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.font-body {
+  font-family: var(--font-body), sans-serif;
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(
+    160deg,
+    rgba(17, 17, 17, 0.78),
+    rgba(8, 8, 8, 0.55)
+  );
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    0 0 0 1px rgba(252, 238, 10, 0.04) inset,
+    0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+.interactive-card {
+  cursor: pointer;
+}
+
+.scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.2) 2px,
+    rgba(0, 0, 0, 0.2) 4px
+  );
+  mix-blend-mode: multiply;
+  animation: scan-drift 8s linear infinite;
+}
+
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hud-rings {
+  pointer-events: none;
+}
+
+.hud-rings .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px solid rgba(252, 238, 10, 0.28);
+}
+
+.hud-rings .ring-a {
+  inset: 6%;
+  border-style: dashed;
+  animation: spin 18s linear infinite;
+}
+
+.hud-rings .ring-b {
+  inset: 16%;
+  border-color: rgba(0, 229, 255, 0.35);
+  animation: spin-rev 12s linear infinite;
+}
+
+.hud-rings .ring-c {
+  inset: 28%;
+  border-width: 2px;
+  border-color: rgba(252, 238, 10, 0.65);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  animation: spin 7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes scan-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.1s ease-out infinite;
+}
+
+@keyframes cam-shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-3px, 2px) rotate(-0.2deg);
+  }
+  40% {
+    transform: translate(3px, -2px) rotate(0.2deg);
+  }
+  60% {
+    transform: translate(-2px, -1px);
+  }
+  80% {
+    transform: translate(2px, 1px);
+  }
+}
+
+.animate-cam-shake {
+  animation: cam-shake 0.45s linear;
+}
+
+@keyframes lens-distort {
+  0%,
+  100% {
+    filter: none;
+  }
+  30% {
+    filter: hue-rotate(12deg) contrast(1.15) saturate(1.3);
+    transform: scale(1.01) skewX(0.4deg);
+  }
+  60% {
+    filter: hue-rotate(-8deg) contrast(1.2);
+    transform: scale(1.015) skewX(-0.4deg);
+  }
+}
+
+.animate-lens-distort {
+  animation: lens-distort 0.7s ease;
+}
+
+@keyframes dust-float {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-40vh);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
