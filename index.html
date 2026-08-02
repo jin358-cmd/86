@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEURAL LINK // Cyberpunk 2077 — Night City</title>
+  <meta name="description" content="戴上虛擬眼鏡，透過 Neural Link 接入 Night City 的賽博朋克世界觀。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- Floating HUD Nav -->
+  <header class="hud-nav" id="hud-nav">
+    <div class="hud-nav__left">
+      <span class="hud-chip">SYS.ONLINE</span>
+      <span class="hud-chip hud-chip--dim">OPTIC.V7</span>
+    </div>
+    <nav class="hud-nav__links">
+      <a href="#link" data-nav>LINK</a>
+      <a href="#hierarchy" data-nav>HIERARCHY</a>
+      <a href="#chrome" data-nav>CHROME</a>
+      <a href="#districts" data-nav>DISTRICTS</a>
+    </nav>
+    <div class="hud-nav__right">
+      <span class="hud-clock" id="hud-clock">00:00:00</span>
+      <span class="hud-chip hud-chip--warn">ICE.LOW</span>
+    </div>
+  </header>
+
+  <!-- Corner Markers -->
+  <aside class="corner corner--tl" aria-hidden="true">
+    <span>X: 34.0522</span>
+    <span>Y: −118.2437</span>
+    <span>Z: NET.LAYER.03</span>
+  </aside>
+  <aside class="corner corner--tr" aria-hidden="true">
+    <span>STATUS: STBY</span>
+    <span>PKT: 2077</span>
+    <span>UID: V-ZERO</span>
+  </aside>
+  <aside class="corner corner--bl" aria-hidden="true">
+    <span>NODE // NC-01</span>
+    <span>LATENCY: 12ms</span>
+  </aside>
+  <aside class="corner corner--br" aria-hidden="true">
+    <span>ERR.00</span>
+    <span>SYNC.OK</span>
+  </aside>
+
+  <!-- Immersive Entry Hero -->
+  <main>
+    <section class="hero" id="link">
+      <div class="hero__atmosphere" aria-hidden="true">
+        <div class="hero__grid"></div>
+        <div class="hero__glow"></div>
+      </div>
+
+      <div class="hero__brand">
+        <p class="hero__eyebrow">VIRTUAL OPTICS ENGAGED</p>
+        <h1 class="hero__title glitch" data-text="CYBERPUNK 2077">CYBERPUNK 2077</h1>
+        <p class="hero__tagline">戴上虛擬眼鏡。接入 Night City。<br />在這裡，肉體只是硬體，街道才是作業系統。</p>
+      </div>
+
+      <div class="neural-stage">
+        <div class="hud-rings" aria-hidden="true">
+          <div class="ring ring--a"></div>
+          <div class="ring ring--b"></div>
+          <div class="ring ring--c"></div>
+          <div class="ring ring--ticks"></div>
+          <div class="ring-cross"></div>
+        </div>
+
+        <button class="neural-btn" id="neural-btn" type="button" aria-label="啟動 Neural Link">
+          <span class="neural-btn__pulse"></span>
+          <span class="neural-btn__label">NEURAL LINK</span>
+          <span class="neural-btn__sub">JACK IN // INIT</span>
+        </button>
+      </div>
+
+      <p class="hero__hint" id="hero-hint">按下啟動 · 進入夜之城協議</p>
+    </section>
+
+    <!-- Boot Overlay -->
+    <div class="boot-overlay" id="boot-overlay" hidden>
+      <div class="boot-overlay__inner">
+        <p class="boot-line">NEURAL INTERFACE INITIALIZING...</p>
+        <p class="boot-line">OPTIC FEED SYNC — ████████░░ 82%</p>
+        <p class="boot-line">NIGHT CITY NET — CONNECTED</p>
+        <p class="boot-line boot-line--accent">WELCOME TO THE AFTERLIFE, CHOOM.</p>
+      </div>
+    </div>
+
+    <!-- Worldview -->
+    <section class="lore" id="world">
+      <header class="lore__header">
+        <h2 class="lore__title">NIGHT CITY PROTOCOL</h2>
+        <p class="lore__lead">三個核心層級構成這座反烏托邦都市的運作邏輯——誰掌權、誰被改造、誰被困在哪個街區。</p>
+      </header>
+
+      <div class="lore__grid">
+        <!-- Hierarchy -->
+        <article class="lore-block" id="hierarchy">
+          <div class="lore-logo" aria-hidden="true">
+            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="112" height="112" stroke="currentColor" stroke-width="2" opacity="0.35"/>
+              <path d="M60 18 L92 38 V70 L60 90 L28 70 V38 Z" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M60 34 L78 45 V67 L60 78 L42 67 V45 Z" stroke="#FCEE0A" stroke-width="2"/>
+              <circle cx="60" cy="56" r="6" fill="#FCEE0A"/>
+              <path d="M60 28 V40 M60 72 V84 M36 56 H48 M72 56 H84" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+              <text x="60" y="108" text-anchor="middle" fill="currentColor" font-size="8" font-family="Share Tech Mono, monospace" letter-spacing="2">CLS.SYS</text>
+            </svg>
+          </div>
+          <div class="lore-copy">
+            <p class="lore-kicker">01 // STRUCTURE</p>
+            <h3>階級制度 <span>HIERARCHY</span></h3>
+            <p>
+              企業高樓刺穿煙霧，下方是被榨乾的街頭。Arasaka、Militech、Kang Tao——
+              超級企業制定法則，傭兵與網駭在縫隙中求生。你不是市民，你是資產或威脅。
+            </p>
+            <ul class="lore-meta">
+              <li><span>CORPO</span> 企業菁英 · 高牆之內</li>
+              <li><span>FIXER</span> 中介網絡 · 情報與契約</li>
+              <li><span>STREET</span> 街頭生存 · 沒有安全網</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Chrome -->
+        <article class="lore-block lore-block--reverse" id="chrome">
+          <div class="lore-logo" aria-hidden="true">
+            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="112" height="112" stroke="currentColor" stroke-width="2" opacity="0.35"/>
+              <circle cx="60" cy="52" r="28" stroke="currentColor" stroke-width="2"/>
+              <circle cx="60" cy="52" r="16" stroke="#FCEE0A" stroke-width="2"/>
+              <path d="M60 24 V36 M60 68 V80 M32 52 H44 M76 52 H88" stroke="#FCEE0A" stroke-width="2"/>
+              <path d="M40 90 H80" stroke="currentColor" stroke-width="2"/>
+              <path d="M48 90 L52 78 H68 L72 90" stroke="currentColor" stroke-width="2"/>
+              <rect x="54" y="46" width="12" height="12" fill="#FCEE0A"/>
+              <text x="60" y="108" text-anchor="middle" fill="currentColor" font-size="8" font-family="Share Tech Mono, monospace" letter-spacing="2">CYB.MOD</text>
+            </svg>
+          </div>
+          <div class="lore-copy">
+            <p class="lore-kicker">02 // BODYWARE</p>
+            <h3>改造裝置 <span>CHROME</span></h3>
+            <p>
+              義眼、反射增幅、螳螂刀、神經連接器——肉體被改寫成武器與介面。
+              越多 Chrome，越接近「網路幽靈」；也越接近精神崩潰的邊緣。
+            </p>
+            <ul class="lore-meta">
+              <li><span>OPTICS</span> 視覺強化 · 目標鎖定</li>
+              <li><span>SANDY</span> 時間稀釋 · 殺戮節奏</li>
+              <li><span>CYBERPSYCHO</span> 過度改造 · 人性流失</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Districts -->
+        <article class="lore-block" id="districts">
+          <div class="lore-logo" aria-hidden="true">
+            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="112" height="112" stroke="currentColor" stroke-width="2" opacity="0.35"/>
+              <path d="M20 88 V48 L36 36 V88 Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M40 88 V28 L58 18 V88 Z" stroke="#FCEE0A" stroke-width="2"/>
+              <path d="M62 88 V40 L80 30 V88 Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M84 88 V52 L100 44 V88 Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M16 88 H104" stroke="#FCEE0A" stroke-width="1.5"/>
+              <circle cx="49" cy="42" r="2" fill="#FCEE0A"/>
+              <circle cx="71" cy="50" r="2" fill="currentColor"/>
+              <text x="60" y="108" text-anchor="middle" fill="currentColor" font-size="8" font-family="Share Tech Mono, monospace" letter-spacing="2">MAP.NC</text>
+            </svg>
+          </div>
+          <div class="lore-copy">
+            <p class="lore-kicker">03 // TERRITORY</p>
+            <h3>區域地圖 <span>DISTRICTS</span></h3>
+            <p>
+              City Center 的霓虹玻璃、Watson 的幫派巷弄、Westbrook 的享樂與謊言、
+              Pacifica 的廢棄度假區——每一區都是一種死法，也是一種活法。
+            </p>
+            <ul class="lore-meta">
+              <li><span>WATSON</span> 起步區 · 髒亂與機會</li>
+              <li><span>CITY CENTER</span> 企業心臟 · 權力高塔</li>
+              <li><span>PACIFICA</span> 失序地帶 · 無人治理</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>
+        <span class="glitch-inline" data-text="WAKE THE FUCK UP, SAMURAI">WAKE THE FUCK UP, SAMURAI</span>
+        <span class="footer-sep">//</span>
+        <span>NIGHT CITY NEVER SLEEPS</span>
+      </p>
+      <p class="footer-meta">FAN CONCEPT INTERFACE · NOT AFFILIATED WITH CD PROJEKT RED</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
