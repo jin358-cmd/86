@@ -321,8 +321,8 @@ export function ProductCenter() {
                     }}
                     className={`px-3 py-1 font-hud text-[10px] tracking-[0.16em] transition ${
                       role === item.id
-                        ? "bg-gvg-yellow text-black"
-                        : "border border-white/15 text-gvg-muted hover:text-gvg-purple"
+                        ? "bg-gvg-cyan text-white"
+                        : "border border-black/10 text-gvg-muted hover:text-gvg-magenta"
                     }`}
                   >
                     {item.zh}
@@ -355,14 +355,14 @@ export function ProductCenter() {
                     <p className="font-mono text-[10px] tracking-[0.2em] text-gvg-cyan">
                       {ROLE_LABEL[product.role]} · {product.region}
                     </p>
-                    <h3 className="mt-1 font-display text-base tracking-[0.08em] text-gvg-yellow">
+                    <h3 className="mt-1 font-display text-base tracking-[0.08em] text-gvg-ink">
                       {product.name}
                     </h3>
                     <p className="mt-1 font-body text-xs text-gvg-muted">
                       {product.seller}
                     </p>
                     <div className="mt-3 flex items-center justify-between gap-2">
-                      <span className="font-hud text-sm text-white">
+                      <span className="font-hud text-sm text-gvg-magenta">
                         {product.price}
                       </span>
                       <span className="font-mono text-[10px] text-gvg-muted">
@@ -382,9 +382,9 @@ export function ProductCenter() {
             {/* Listing form */}
             <form
               onSubmit={onSubmit}
-              className="glass-panel mt-10 space-y-4 border-gvg-purple/20 p-5"
+              className="glass-panel mt-10 space-y-4 border-gvg-cyan/20 p-5"
             >
-              <p className="font-mono text-[10px] tracking-[0.28em] text-gvg-purple">
+              <p className="font-mono text-[10px] tracking-[0.28em] text-gvg-cyan">
                 DIRECT LISTING · {ROLE_LABEL[role]} · {active.zh}
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -395,7 +395,7 @@ export function ProductCenter() {
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="mt-1 w-full border border-white/15 bg-black/40 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-purple/60"
+                    className="mt-1 w-full border border-black/10 bg-white/80 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-cyan/60"
                     placeholder="e.g. L-Arginine 1000mg"
                   />
                 </label>
@@ -406,7 +406,7 @@ export function ProductCenter() {
                   <input
                     value={seller}
                     onChange={(e) => setSeller(e.target.value)}
-                    className="mt-1 w-full border border-white/15 bg-black/40 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-purple/60"
+                    className="mt-1 w-full border border-black/10 bg-white/80 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-cyan/60"
                   />
                 </label>
                 <label className="block">
@@ -416,7 +416,7 @@ export function ProductCenter() {
                   <select
                     value={region}
                     onChange={(e) => setRegion(e.target.value)}
-                    className="mt-1 w-full border border-white/15 bg-black/40 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-purple/60"
+                    className="mt-1 w-full border border-black/10 bg-white/80 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-cyan/60"
                   >
                     {ORIGINS.map((r) => (
                       <option key={r} value={r}>
@@ -432,7 +432,7 @@ export function ProductCenter() {
                   <input
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="mt-1 w-full border border-white/15 bg-black/40 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-purple/60"
+                    className="mt-1 w-full border border-black/10 bg-white/80 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-cyan/60"
                     placeholder="US$ 18.90"
                   />
                 </label>
@@ -443,14 +443,14 @@ export function ProductCenter() {
                   <input
                     value={moq}
                     onChange={(e) => setMoq(e.target.value)}
-                    className="mt-1 w-full border border-white/15 bg-black/40 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-purple/60"
+                    className="mt-1 w-full border border-black/10 bg-white/80 px-3 py-2 font-body text-sm text-gvg-text outline-none focus:border-gvg-cyan/60"
                     placeholder="24 pcs"
                   />
                 </label>
               </div>
               <button
                 type="submit"
-                className="w-full border border-gvg-yellow bg-gvg-yellow px-4 py-3 font-display text-sm tracking-[0.22em] text-black transition hover:bg-transparent hover:text-gvg-yellow"
+                className="w-full border border-gvg-cyan bg-gvg-cyan px-4 py-3 font-display text-sm tracking-[0.22em] text-white transition hover:bg-transparent hover:text-gvg-cyan"
               >
                 SUBMIT LISTING
               </button>
@@ -461,11 +461,11 @@ export function ProductCenter() {
               ) : null}
               <p className="font-body text-xs text-gvg-muted">
                 前往{" "}
-                <Link href="/marketplace" className="text-gvg-yellow underline">
+                <Link href="/marketplace" className="text-gvg-cyan underline">
                   Marketplace
                 </Link>{" "}
                 或{" "}
-                <Link href="/commerce" className="text-gvg-yellow underline">
+                <Link href="/commerce" className="text-gvg-cyan underline">
                   電商架構
                 </Link>
                 。
