@@ -21,7 +21,7 @@ export const SCENE_META: Record<
   login: { label: "LOGIN", autoAdvanceMs: 4500 },
   city: { label: "CITY", autoAdvanceMs: 8000 },
   world: { label: "WORLD", autoAdvanceMs: undefined },
-  missions: { label: "MISSION", autoAdvanceMs: undefined },
+  missions: { label: "MODULES", autoAdvanceMs: undefined },
   dashboard: { label: "OS", autoAdvanceMs: undefined },
 };
 
