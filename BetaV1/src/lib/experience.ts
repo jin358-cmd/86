@@ -4,7 +4,6 @@ export const SCENES = [
   "login",
   "city",
   "world",
-  "missions",
   "dashboard",
 ] as const;
 
@@ -14,13 +13,12 @@ export const SCENE_META: Record<
   SceneId,
   { label: string; autoAdvanceMs?: number }
 > = {
-  // INITIALIZE → WEAR → VR Optics
+  // INITIALIZE → WEAR → VR Optics → … → OS
   wear: { label: "LINK", autoAdvanceMs: undefined },
   neuralGlass: { label: "OPTICS", autoAdvanceMs: 7000 },
   login: { label: "LOGIN", autoAdvanceMs: 4500 },
   city: { label: "CITY", autoAdvanceMs: 8000 },
   world: { label: "WORLD", autoAdvanceMs: undefined },
-  missions: { label: "MISSION", autoAdvanceMs: undefined },
   dashboard: { label: "OS", autoAdvanceMs: undefined },
 };
 

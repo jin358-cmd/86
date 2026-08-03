@@ -18,7 +18,6 @@ import { WearScene } from "@/sections/WearScene";
 import { LoginScene } from "@/sections/LoginScene";
 import { CityRevealScene } from "@/sections/CityRevealScene";
 import { WorldIntroScene } from "@/sections/WorldIntroScene";
-import { MissionSelectScene } from "@/sections/MissionSelectScene";
 import { DashboardScene } from "@/sections/DashboardScene";
 
 function StartGate() {
@@ -59,7 +58,7 @@ function StartGate() {
 function SceneStage() {
   const { scene, transitioning, started } = useExperience();
   const [fx, setFx] = useState({ flash: false, shake: false, distort: false });
-  useLenis(started && (scene === "world" || scene === "missions"));
+  useLenis(started && scene === "world");
 
   const onJackInEffects = useCallback((active: boolean) => {
     setFx({ flash: active, shake: active, distort: active });
@@ -101,7 +100,6 @@ function SceneStage() {
               {scene === "login" && <LoginScene />}
               {scene === "city" && <CityRevealScene />}
               {scene === "world" && <WorldIntroScene />}
-              {scene === "missions" && <MissionSelectScene />}
               {scene === "dashboard" && <DashboardScene />}
             </motion.div>
           </AnimatePresence>
