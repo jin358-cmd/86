@@ -6,14 +6,7 @@ import { useEffect, useState } from "react";
 import { GLASS_SCAN_LINES } from "@/data/content";
 import { playTone } from "@/lib/audio";
 
-const NeuralGlassCanvas = dynamic(
-  () =>
-    import("@/components/three/NeuralGlassScene").then(
-      (m) => m.NeuralGlassCanvas,
-    ),
-  { ssr: false, loading: () => <div className="h-full w-full bg-gvg-bg" /> },
-);
-
+/** Optics HUD only — VR canvas is owned by Experience for wear continuity. */
 export function NeuralGlassSceneSection() {
   const [scan, setScan] = useState(0);
 
@@ -29,12 +22,6 @@ export function NeuralGlassSceneSection() {
 
   return (
     <section className="relative min-h-[100dvh] overflow-hidden">
-      {/* Full-bleed VR panorama — no frame / panel occlusion over the city */}
-      <div className="absolute inset-0">
-        <NeuralGlassCanvas />
-      </div>
-
-      {/* Thin edge HUD only — center stays clear */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between px-5 pt-6 md:px-8 md:pt-8">
         <div>
           <p className="font-display text-xs tracking-[0.4em] text-gvg-yellow">
@@ -72,3 +59,11 @@ export function NeuralGlassSceneSection() {
     </section>
   );
 }
+
+export const NeuralGlassBackground = dynamic(
+  () =>
+    import("@/components/three/NeuralGlassScene").then(
+      (m) => m.NeuralGlassCanvas,
+    ),
+  { ssr: false, loading: () => <div className="h-full w-full bg-gvg-bg" /> },
+);

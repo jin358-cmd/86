@@ -11,7 +11,10 @@ import {
 } from "@/hooks/useExperience";
 import { useLenis } from "@/hooks/useLenis";
 import { BootScene } from "@/sections/BootScene";
-import { NeuralGlassSceneSection } from "@/sections/NeuralGlassSceneSection";
+import {
+  NeuralGlassBackground,
+  NeuralGlassSceneSection,
+} from "@/sections/NeuralGlassSceneSection";
 import { WearScene } from "@/sections/WearScene";
 import { LoginScene } from "@/sections/LoginScene";
 import { CityRevealScene } from "@/sections/CityRevealScene";
@@ -77,9 +80,14 @@ function SceneStage() {
             transitioning ? "pointer-events-none opacity-40 blur-sm" : ""
           }
         >
-          {(scene === "boot" || scene === "wear" || scene === "login") && (
-            <FloatingDust />
+          {/* Persist VR Night City under Optics + Wear so LINK sits in front */}
+          {(scene === "neuralGlass" || scene === "wear") && (
+            <div className="fixed inset-0 z-0">
+              <NeuralGlassBackground />
+            </div>
           )}
+
+          {(scene === "boot" || scene === "login") && <FloatingDust />}
           <AnimatePresence mode="wait">
             <motion.div
               key={scene}
@@ -87,6 +95,7 @@ function SceneStage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
+              className="relative z-10"
             >
               {scene === "boot" && <BootScene />}
               {scene === "neuralGlass" && <NeuralGlassSceneSection />}
