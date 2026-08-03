@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Volume2, VolumeX, FastForward } from "lucide-react";
 import { useExperience } from "@/hooks/useExperience";
 import { useHudClock } from "@/hooks/useHudClock";
@@ -11,8 +12,26 @@ export function ChromeHud() {
   const { scene, sceneIndex, skip, muted, toggleMute, started } =
     useExperience();
   const { time, date } = useHudClock();
+  const [navOpen, setNavOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      e.preventDefault();
+      setNavOpen((v) => !v);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Reset nav closed when scene changes
+  useEffect(() => {
+    setNavOpen(false);
+  }, [scene]);
 
   if (!started || scene === "boot") return null;
+
+  const isOs = scene === "dashboard";
 
   return (
     <>
@@ -30,19 +49,41 @@ export function ChromeHud() {
           </p>
         </div>
 
-        <nav className="glass-panel hidden items-center gap-3 px-3 py-2 md:flex">
-          {SCENES.map((id, i) => (
-            <span
-              key={id}
-              className={cn(
-                "font-hud text-[10px] tracking-[0.2em]",
-                i === sceneIndex ? "text-gvg-yellow" : "text-gvg-muted/70",
-              )}
-            >
-              {SCENE_META[id].label}
-            </span>
-          ))}
-        </nav>
+        <div className="flex flex-col items-center gap-1">
+          <AnimatePresence>
+            {navOpen ? (
+              <motion.nav
+                key="scene-nav"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="glass-panel flex flex-wrap items-center justify-center gap-2 px-3 py-2 md:gap-3"
+              >
+                {SCENES.map((id, i) => (
+                  <span
+                    key={id}
+                    className={cn(
+                      "font-hud text-[10px] tracking-[0.2em]",
+                      i === sceneIndex ? "text-gvg-yellow" : "text-gvg-muted/70",
+                    )}
+                  >
+                    {SCENE_META[id].label}
+                  </span>
+                ))}
+              </motion.nav>
+            ) : (
+              <motion.p
+                key="tab-hint"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded border border-white/10 bg-black/40 px-2 py-1 font-mono text-[9px] tracking-[0.22em] text-white/40"
+              >
+                TAB · NAV
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
           <button
@@ -74,14 +115,17 @@ export function ChromeHud() {
         <span className="text-gvg-cyan">{time}</span>
       </aside>
 
-      <aside className="pointer-events-none fixed right-4 top-24 z-[90] hidden flex-col items-end gap-1 font-mono text-[10px] tracking-wider text-gvg-muted md:flex">
-        <span className="text-gvg-cyan">SIGNAL 98%</span>
-        <span>AI CORE · STABLE</span>
-        <span>LATENCY 11ms</span>
-        <span className="text-gvg-yellow">ONLINE</span>
-      </aside>
+      {/* Right telemetry moved into OS accordion on dashboard */}
+      {!isOs && (
+        <aside className="pointer-events-none fixed right-4 top-24 z-[90] hidden flex-col items-end gap-1 font-mono text-[10px] tracking-wider text-gvg-muted md:flex">
+          <span className="text-gvg-cyan">SIGNAL 98%</span>
+          <span>AI CORE · STABLE</span>
+          <span>LATENCY 11ms</span>
+          <span className="text-gvg-yellow">ONLINE</span>
+        </aside>
+      )}
 
-      {(scene === "login" || scene === "dashboard") && (
+      {scene === "login" && (
         <footer className="pointer-events-none fixed inset-x-0 bottom-4 z-[90] flex justify-center px-4">
           <div className="glass-panel flex flex-wrap items-center justify-center gap-4 px-4 py-2 font-hud text-[10px] tracking-[0.22em] text-gvg-muted md:gap-8">
             <span>IDENTITY VERIFIED</span>

@@ -60,9 +60,7 @@ function StartGate() {
 function SceneStage() {
   const { scene, transitioning, started } = useExperience();
   const [fx, setFx] = useState({ flash: false, shake: false, distort: false });
-  useLenis(
-    started && (scene === "world" || scene === "missions" || scene === "dashboard"),
-  );
+  useLenis(started && (scene === "world" || scene === "missions"));
 
   const onJackInEffects = useCallback((active: boolean) => {
     setFx({ flash: active, shake: active, distort: active });

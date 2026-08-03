@@ -23,7 +23,7 @@ import {
   setMuted,
   isMuted,
 } from "@/lib/audio";
-import type { MissionId } from "@/data/content";
+import { MISSIONS, type MissionId } from "@/data/content";
 
 type ExperienceContextValue = {
   scene: SceneId;
@@ -35,6 +35,8 @@ type ExperienceContextValue = {
   advance: () => void;
   skip: () => void;
   selectMission: (id: MissionId) => void;
+  assignMission: (id: MissionId) => void;
+  cycleMission: () => void;
   toggleMute: () => void;
   begin: () => Promise<void>;
   started: boolean;
@@ -91,6 +93,20 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     [goTo],
   );
 
+  const assignMission = useCallback((id: MissionId) => {
+    setSelectedMission(id);
+    playTone("ui");
+  }, []);
+
+  const cycleMission = useCallback(() => {
+    setSelectedMission((current) => {
+      const idx = MISSIONS.findIndex((m) => m.id === current);
+      const next = MISSIONS[(idx < 0 ? 0 : idx + 1) % MISSIONS.length];
+      playTone("ui");
+      return next.id;
+    });
+  }, []);
+
   const toggleMute = useCallback(() => {
     setMutedState((m) => {
       const next = !m;
@@ -133,6 +149,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       advance,
       skip,
       selectMission,
+      assignMission,
+      cycleMission,
       toggleMute,
       begin,
       started,
@@ -147,6 +165,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       advance,
       skip,
       selectMission,
+      assignMission,
+      cycleMission,
       toggleMute,
       begin,
       started,
