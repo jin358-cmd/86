@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   AI_SERVICES,
+  MARKET_SUPPLIERS,
   ORIGINS,
   PRODUCT_CATEGORIES,
   SAMPLE_PRODUCTS,
@@ -12,51 +13,8 @@ import {
 } from "@/data/commerce";
 import { playTone } from "@/lib/audio";
 
-const SUPPLIERS = [
-  {
-    id: "s1",
-    name: "Green Life Co., Ltd.",
-    region: "Taiwan",
-    image: "/images/categories/cat-health.png",
-    tags: ["Verified", "Manufacturer"],
-    rating: 4.9,
-  },
-  {
-    id: "s2",
-    name: "Bright Source Trading",
-    region: "USA",
-    image: "/images/categories/cat-home.png",
-    tags: ["Verified", "Trading"],
-    rating: 4.7,
-  },
-  {
-    id: "s3",
-    name: "Pacific Goods",
-    region: "Japan",
-    image: "/images/categories/cat-food.png",
-    tags: ["OEM", "Wholesaler"],
-    rating: 4.6,
-  },
-  {
-    id: "s4",
-    name: "Vista Fab TW",
-    region: "Taiwan",
-    image: "/images/categories/cat-hardware.png",
-    tags: ["Manufacturer"],
-    rating: 4.8,
-  },
-  {
-    id: "s5",
-    name: "Orbit Agent SG",
-    region: "China",
-    image: "/images/categories/cat-building.png",
-    tags: ["Verified", "Agent"],
-    rating: 4.5,
-  },
-];
-
 export function MarketplaceHub() {
-  const [bg, setBg] = useState("/images/pages/page-marketplace.png");
+  const [bg, setBg] = useState("/images/market/market-hero.png");
 
   return (
     <div className="relative min-h-[100dvh]">
@@ -66,11 +24,11 @@ export function MarketplaceHub() {
           src={bg}
           alt=""
           fill
-          className="object-cover opacity-22 transition-opacity duration-500"
+          className="object-cover opacity-30 transition-opacity duration-500"
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gvg-bg/65 via-gvg-bg/85 to-gvg-bg" />
+        <div className="absolute inset-0 bg-gradient-to-b from-gvg-bg/55 via-gvg-bg/80 to-gvg-bg" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
@@ -79,29 +37,29 @@ export function MarketplaceHub() {
         </p>
         <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_360px]">
           <div>
-            <h1 className="font-display text-4xl tracking-[0.12em] text-gvg-yellow md:text-5xl">
+            <h1 className="font-display text-4xl tracking-[0.12em] text-gvg-ink md:text-5xl">
               MARKETPLACE
             </h1>
             <p className="mt-3 max-w-xl font-body text-gvg-muted">
-              連接全球供應商與買家。精選供應商、熱門商品與分類照片 Banner。
+              連接全球供應商與買家。精選供應商、熱門商品與分類照片皆已生成實圖。
             </p>
           </div>
-          <div className="relative aspect-[16/7] overflow-hidden border border-gvg-purple/30 lg:aspect-auto lg:min-h-[140px]">
+          <div className="relative aspect-[16/7] overflow-hidden border border-gvg-cyan/25 lg:aspect-auto lg:min-h-[140px]">
             <Image
-              src="/images/pages/page-marketplace.png"
+              src="/images/market/market-hero.png"
               alt="Become a seller"
               fill
               className="object-cover"
               sizes="400px"
             />
-            <div className="absolute inset-0 bg-black/55" />
+            <div className="absolute inset-0 bg-gradient-to-r from-gvg-ink/55 to-transparent" />
             <div className="absolute inset-0 flex flex-col justify-center p-5">
               <p className="font-display text-lg tracking-[0.14em] text-white">
                 全球商機 · 無限延伸
               </p>
               <Link
                 href="/products"
-                className="mt-3 inline-flex w-fit border border-gvg-yellow bg-gvg-yellow px-4 py-2 font-hud text-[10px] tracking-[0.2em] text-black"
+                className="mt-3 inline-flex w-fit border border-gvg-cyan bg-gvg-cyan px-4 py-2 font-hud text-[10px] tracking-[0.2em] text-white"
               >
                 成為賣家
               </Link>
@@ -124,7 +82,7 @@ export function MarketplaceHub() {
                         setBg(cat.image);
                         playTone("ui");
                       }}
-                      className="flex w-full items-center justify-between px-2 py-1.5 text-left font-hud text-xs text-gvg-muted transition hover:bg-gvg-purple/20 hover:text-white"
+                      className="flex w-full items-center justify-between px-2 py-1.5 text-left font-hud text-xs text-gvg-muted transition hover:bg-gvg-cyan/10 hover:text-gvg-ink"
                     >
                       <span>{cat.zh}</span>
                     </button>
@@ -133,7 +91,7 @@ export function MarketplaceHub() {
               </ul>
               <Link
                 href="/products"
-                className="mt-2 block px-2 font-mono text-[10px] text-gvg-yellow"
+                className="mt-2 block px-2 font-mono text-[10px] text-gvg-cyan"
               >
                 View More →
               </Link>
@@ -167,22 +125,22 @@ export function MarketplaceHub() {
           <div>
             <section>
               <div className="mb-4 flex items-end justify-between">
-                <h2 className="font-display text-2xl tracking-[0.14em] text-gvg-yellow">
+                <h2 className="font-display text-2xl tracking-[0.14em] text-gvg-ink">
                   精選供應商
                 </h2>
                 <Link
                   href="/company"
-                  className="font-mono text-[10px] text-gvg-muted hover:text-gvg-purple"
+                  className="font-mono text-[10px] text-gvg-muted hover:text-gvg-cyan"
                 >
                   ALL SUPPLIERS
                 </Link>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                {SUPPLIERS.map((s) => (
+                {MARKET_SUPPLIERS.map((s) => (
                   <article
                     key={s.id}
                     onMouseEnter={() => setBg(s.image)}
-                    className="glass-panel overflow-hidden transition hover:border-gvg-purple/50"
+                    className="glass-panel overflow-hidden transition hover:border-gvg-cyan/40"
                   >
                     <div className="relative aspect-[4/3]">
                       <Image
@@ -194,7 +152,7 @@ export function MarketplaceHub() {
                       />
                     </div>
                     <div className="p-3">
-                      <h3 className="font-hud text-sm text-gvg-text">{s.name}</h3>
+                      <h3 className="font-hud text-sm text-gvg-ink">{s.name}</h3>
                       <p className="mt-1 font-mono text-[10px] text-gvg-cyan">
                         {s.region} · ★ {s.rating}
                       </p>
@@ -202,7 +160,7 @@ export function MarketplaceHub() {
                         {s.tags.map((t) => (
                           <span
                             key={t}
-                            className="border border-white/10 px-1.5 py-0.5 font-mono text-[9px] text-gvg-muted"
+                            className="border border-black/10 px-1.5 py-0.5 font-mono text-[9px] text-gvg-muted"
                           >
                             {t}
                           </span>
@@ -215,7 +173,7 @@ export function MarketplaceHub() {
             </section>
 
             <section className="mt-10">
-              <h2 className="mb-4 font-display text-2xl tracking-[0.14em] text-gvg-yellow">
+              <h2 className="mb-4 font-display text-2xl tracking-[0.14em] text-gvg-ink">
                 熱門商品
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -227,11 +185,12 @@ export function MarketplaceHub() {
                     <article
                       key={p.id}
                       onMouseEnter={() => {
-                        if (cat) setBg(cat.image);
+                        setBg(p.image);
+                        if (cat) playTone("ui");
                       }}
                       className="glass-panel overflow-hidden"
                     >
-                      <div className="relative aspect-square">
+                      <div className="relative aspect-square bg-white">
                         <Image
                           src={p.image}
                           alt={p.name}
@@ -244,11 +203,11 @@ export function MarketplaceHub() {
                         <p className="font-mono text-[10px] text-gvg-cyan">
                           {p.region} · {p.category}
                         </p>
-                        <h3 className="mt-1 font-display text-base tracking-[0.08em] text-gvg-yellow">
+                        <h3 className="mt-1 font-display text-base tracking-[0.08em] text-gvg-ink">
                           {p.name}
                         </h3>
                         <div className="mt-3 flex justify-between font-hud text-sm">
-                          <span className="text-white">{p.price}</span>
+                          <span className="text-gvg-magenta">{p.price}</span>
                           <span className="text-gvg-muted">MOQ {p.moq}</span>
                         </div>
                       </div>
@@ -259,7 +218,7 @@ export function MarketplaceHub() {
             </section>
 
             <section className="mt-10">
-              <h2 className="mb-4 font-display text-2xl tracking-[0.14em] text-gvg-yellow">
+              <h2 className="mb-4 font-display text-2xl tracking-[0.14em] text-gvg-ink">
                 AI 智慧服務
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -271,12 +230,25 @@ export function MarketplaceHub() {
                       setBg(svc.image);
                       playTone("ui");
                     }}
-                    className="glass-panel p-4 text-left transition hover:border-gvg-purple/50"
+                    className="glass-panel overflow-hidden text-left transition hover:border-gvg-magenta/40"
                   >
-                    <p className="font-mono text-[10px] tracking-[0.2em] text-gvg-cyan">
-                      {svc.title}
-                    </p>
-                    <p className="mt-2 font-hud text-sm text-gvg-text">{svc.zh}</p>
+                    <div className="relative aspect-square">
+                      <Image
+                        src={svc.image}
+                        alt={svc.zh}
+                        fill
+                        className="object-cover"
+                        sizes="220px"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <p className="font-mono text-[10px] tracking-[0.2em] text-gvg-cyan">
+                        {svc.title}
+                      </p>
+                      <p className="mt-1 font-hud text-sm text-gvg-ink">
+                        {svc.zh}
+                      </p>
+                    </div>
                   </button>
                 ))}
               </div>

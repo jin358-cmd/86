@@ -1,6 +1,6 @@
 "use client";
 
-type ToneKind = "boot" | "ui" | "confirm" | "warn" | "whoosh";
+type ToneKind = "boot" | "ui" | "confirm" | "warn" | "whoosh" | "flow";
 
 let audioCtx: AudioContext | null = null;
 let ambienceNodes: { stop: () => void } | null = null;
@@ -52,11 +52,12 @@ export function playTone(kind: ToneKind = "ui") {
     ToneKind,
     { type: OscillatorType; f: number; dur: number; vol: number }
   > = {
-    boot: { type: "sawtooth", f: 180, dur: 0.18, vol: 0.03 },
-    ui: { type: "sine", f: 880, dur: 0.06, vol: 0.02 },
-    confirm: { type: "triangle", f: 520, dur: 0.14, vol: 0.03 },
-    warn: { type: "square", f: 240, dur: 0.12, vol: 0.02 },
-    whoosh: { type: "sine", f: 120, dur: 0.35, vol: 0.035 },
+    boot: { type: "sawtooth", f: 180, dur: 0.18, vol: 0.025 },
+    ui: { type: "sine", f: 920, dur: 0.05, vol: 0.015 },
+    confirm: { type: "triangle", f: 540, dur: 0.12, vol: 0.022 },
+    warn: { type: "square", f: 240, dur: 0.1, vol: 0.016 },
+    whoosh: { type: "sine", f: 140, dur: 0.32, vol: 0.028 },
+    flow: { type: "sine", f: 660, dur: 0.22, vol: 0.012 },
   };
 
   const p = presets[kind];
@@ -65,7 +66,9 @@ export function playTone(kind: ToneKind = "ui") {
   if (kind === "whoosh") {
     osc.frequency.exponentialRampToValueAtTime(40, now + p.dur);
   } else if (kind === "confirm") {
-    osc.frequency.exponentialRampToValueAtTime(p.f * 1.6, now + p.dur);
+    osc.frequency.exponentialRampToValueAtTime(p.f * 1.55, now + p.dur);
+  } else if (kind === "flow") {
+    osc.frequency.exponentialRampToValueAtTime(p.f * 1.35, now + p.dur);
   }
 
   gain.gain.setValueAtTime(0.0001, now);
@@ -75,93 +78,148 @@ export function playTone(kind: ToneKind = "ui") {
   osc.stop(now + p.dur + 0.02);
 }
 
-/** Continuous looping ambient BGM bed */
+/**
+ * Continuous tech-flowing ambient BGM:
+ * low drone + sweeping filter + soft arpeggio + data-tick shimmer
+ */
 export function startAmbience() {
   if (muted || ambienceNodes) return;
   const c = ctx();
   if (!c) return;
 
   const master = c.createGain();
-  master.gain.value = 0.028;
+  master.gain.value = 0.032;
   master.connect(c.destination);
 
   const filter = c.createBiquadFilter();
   filter.type = "lowpass";
-  filter.frequency.value = 900;
-  filter.Q.value = 0.7;
+  filter.frequency.value = 720;
+  filter.Q.value = 0.9;
   filter.connect(master);
+
+  // Slow sweeping filter = "flowing" tech feel
+  const sweep = c.createOscillator();
+  sweep.frequency.value = 0.07;
+  const sweepGain = c.createGain();
+  sweepGain.gain.value = 480;
+  sweep.connect(sweepGain);
+  sweepGain.connect(filter.frequency);
+  filter.frequency.setValueAtTime(720, c.currentTime);
 
   const drone = c.createOscillator();
   drone.type = "sine";
-  drone.frequency.value = 48;
+  drone.frequency.value = 55;
   const droneGain = c.createGain();
-  droneGain.gain.value = 0.55;
+  droneGain.gain.value = 0.42;
   drone.connect(droneGain);
   droneGain.connect(filter);
 
+  const sub = c.createOscillator();
+  sub.type = "triangle";
+  sub.frequency.value = 82.5;
+  const subGain = c.createGain();
+  subGain.gain.value = 0.16;
+  sub.connect(subGain);
+  subGain.connect(filter);
+
   const pulse = c.createOscillator();
   pulse.type = "triangle";
-  pulse.frequency.value = 96;
+  pulse.frequency.value = 110;
   const pulseGain = c.createGain();
-  pulseGain.gain.value = 0.12;
+  pulseGain.gain.value = 0.08;
   const lfo = c.createOscillator();
-  lfo.frequency.value = 0.35;
+  lfo.frequency.value = 0.42;
   const lfoGain = c.createGain();
-  lfoGain.gain.value = 0.1;
+  lfoGain.gain.value = 0.07;
   lfo.connect(lfoGain);
   lfoGain.connect(pulseGain.gain);
   pulse.connect(pulseGain);
   pulseGain.connect(filter);
 
+  // Flowing arpeggio bed
   const arp = c.createOscillator();
   arp.type = "sine";
-  arp.frequency.value = 196;
+  arp.frequency.value = 220;
   const arpGain = c.createGain();
-  arpGain.gain.value = 0.04;
+  arpGain.gain.value = 0.035;
   const arpLfo = c.createOscillator();
-  arpLfo.frequency.value = 2.5;
+  arpLfo.frequency.value = 3.2;
   const arpLfoGain = c.createGain();
-  arpLfoGain.gain.value = 0.035;
+  arpLfoGain.gain.value = 0.03;
   arpLfo.connect(arpLfoGain);
   arpLfoGain.connect(arpGain.gain);
+  // gentle pitch drift
+  const arpDrift = c.createOscillator();
+  arpDrift.frequency.value = 0.11;
+  const arpDriftGain = c.createGain();
+  arpDriftGain.gain.value = 28;
+  arpDrift.connect(arpDriftGain);
+  arpDriftGain.connect(arp.frequency);
   arp.connect(arpGain);
   arpGain.connect(master);
 
   const shimmer = c.createOscillator();
   shimmer.type = "sine";
-  shimmer.frequency.value = 392;
+  shimmer.frequency.value = 440;
   const shimmerGain = c.createGain();
-  shimmerGain.gain.value = 0.018;
+  shimmerGain.gain.value = 0.014;
+  const shimLfo = c.createOscillator();
+  shimLfo.frequency.value = 0.22;
+  const shimLfoGain = c.createGain();
+  shimLfoGain.gain.value = 0.01;
+  shimLfo.connect(shimLfoGain);
+  shimLfoGain.connect(shimmerGain.gain);
   shimmer.connect(shimmerGain);
   shimmerGain.connect(master);
 
-  // Soft purple-ish fifth for cyber bed variety
-  const fifth = c.createOscillator();
-  fifth.type = "triangle";
-  fifth.frequency.value = 72;
-  const fifthGain = c.createGain();
-  fifthGain.gain.value = 0.08;
-  fifth.connect(fifthGain);
-  fifthGain.connect(filter);
+  // Soft noise bed via detuned high sine as data stream
+  const data = c.createOscillator();
+  data.type = "square";
+  data.frequency.value = 880;
+  const dataGain = c.createGain();
+  dataGain.gain.value = 0.004;
+  const dataFilter = c.createBiquadFilter();
+  dataFilter.type = "bandpass";
+  dataFilter.frequency.value = 1200;
+  dataFilter.Q.value = 4;
+  const dataLfo = c.createOscillator();
+  dataLfo.frequency.value = 5.5;
+  const dataLfoGain = c.createGain();
+  dataLfoGain.gain.value = 0.0035;
+  dataLfo.connect(dataLfoGain);
+  dataLfoGain.connect(dataGain.gain);
+  data.connect(dataFilter);
+  dataFilter.connect(dataGain);
+  dataGain.connect(master);
 
   drone.start();
+  sub.start();
   pulse.start();
   lfo.start();
   arp.start();
   arpLfo.start();
+  arpDrift.start();
   shimmer.start();
-  fifth.start();
+  shimLfo.start();
+  data.start();
+  dataLfo.start();
+  sweep.start();
 
   ambienceNodes = {
     stop: () => {
       try {
         drone.stop();
+        sub.stop();
         pulse.stop();
         lfo.stop();
         arp.stop();
         arpLfo.stop();
+        arpDrift.stop();
         shimmer.stop();
-        fifth.stop();
+        shimLfo.stop();
+        data.stop();
+        dataLfo.stop();
+        sweep.stop();
       } catch {
         /* already stopped */
       }
@@ -176,16 +234,16 @@ export function stopAmbience() {
   ambienceNodes = null;
 }
 
-/** Soft UI SFX that rotate continuously while experience is active */
+/** Soft flowing tech ticks while experience is active */
 export function startSfxLoop() {
   if (muted || sfxLoopId !== null) return;
-  const sequence: ToneKind[] = ["ui", "boot", "ui", "confirm", "ui", "whoosh"];
+  const sequence: ToneKind[] = ["flow", "ui", "flow", "confirm", "flow", "whoosh"];
   let i = 0;
   sfxLoopId = window.setInterval(() => {
     if (muted) return;
     playTone(sequence[i % sequence.length]);
     i += 1;
-  }, 4200);
+  }, 3600);
 }
 
 export function stopSfxLoop() {

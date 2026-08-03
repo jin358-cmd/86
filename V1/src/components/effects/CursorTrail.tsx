@@ -2,38 +2,25 @@
 
 import { useEffect, useRef } from "react";
 
-type MeteorHue = "purple" | "white" | "yellow" | "cyan";
-
-type Meteor = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  len: number;
-  width: number;
-  hue: MeteorHue;
-  lag: number;
-};
-
-type Spark = {
+type TrailPoint = {
   x: number;
   y: number;
   life: number;
-  vx: number;
-  vy: number;
-  purple: boolean;
 };
 
-const METEOR_COUNT = 7;
-const HUES: MeteorHue[] = [
-  "purple",
-  "white",
-  "purple",
-  "white",
-  "yellow",
-  "cyan",
-  "purple",
-];
+type Shard = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  len: number;
+  hue: "cyan" | "magenta" | "white";
+};
+
+const TRAIL_MAX = 10;
+const SHARD_BURST = 7;
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,18 +44,11 @@ export function CursorTrail() {
     let prevMx = mx;
     let prevMy = my;
     let raf = 0;
-    const sparks: Spark[] = [];
-
-    const meteors: Meteor[] = Array.from({ length: METEOR_COUNT }, (_, i) => ({
-      x: mx,
-      y: my,
-      vx: 0,
-      vy: 0,
-      len: 30 + i * 9,
-      width: 1.5 + i * 0.22,
-      hue: HUES[i % HUES.length],
-      lag: 0.16 + i * 0.07,
-    }));
+    let dragX = mx;
+    let dragY = my;
+    const trail: TrailPoint[] = [];
+    const shards: Shard[] = [];
+    let burstCooldown = 0;
 
     const resize = () => {
       w = window.innerWidth;
@@ -81,56 +61,35 @@ export function CursorTrail() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
+    const spawnBurst = (x: number, y: number, speed: number) => {
+      const count = SHARD_BURST + Math.floor(Math.min(speed / 8, 4));
+      for (let i = 0; i < count; i += 1) {
+        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.35;
+        const force = 1.4 + Math.random() * 2.2 + speed * 0.04;
+        const hues: Shard["hue"][] = ["cyan", "magenta", "white"];
+        shards.push({
+          x,
+          y,
+          vx: Math.cos(angle) * force,
+          vy: Math.sin(angle) * force,
+          life: 1,
+          maxLife: 1,
+          len: 6 + Math.random() * 8,
+          hue: hues[i % hues.length],
+        });
+      }
+      if (shards.length > 90) shards.splice(0, shards.length - 90);
+    };
+
     const onMove = (e: PointerEvent) => {
       mx = e.clientX;
       my = e.clientY;
     };
 
-    const drawMeteor = (m: Meteor) => {
-      const speed = Math.hypot(m.vx, m.vy) || 0.001;
-      const ux = m.vx / speed;
-      const uy = m.vy / speed;
-      const tailX = m.x - ux * m.len;
-      const tailY = m.y - uy * m.len;
-
-      const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
-      if (m.hue === "purple") {
-        grad.addColorStop(0, "rgba(168, 85, 255, 0)");
-        grad.addColorStop(0.4, "rgba(168, 85, 255, 0.4)");
-        grad.addColorStop(1, "rgba(230, 200, 255, 0.95)");
-      } else if (m.hue === "white") {
-        grad.addColorStop(0, "rgba(255, 255, 255, 0)");
-        grad.addColorStop(0.45, "rgba(255, 255, 255, 0.35)");
-        grad.addColorStop(1, "rgba(255, 255, 255, 0.95)");
-      } else if (m.hue === "yellow") {
-        grad.addColorStop(0, "rgba(252, 238, 10, 0)");
-        grad.addColorStop(0.45, "rgba(252, 238, 10, 0.3)");
-        grad.addColorStop(1, "rgba(255, 255, 220, 0.9)");
-      } else {
-        grad.addColorStop(0, "rgba(0, 229, 255, 0)");
-        grad.addColorStop(0.45, "rgba(0, 229, 255, 0.3)");
-        grad.addColorStop(1, "rgba(200, 250, 255, 0.9)");
-      }
-
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = m.width;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(tailX, tailY);
-      ctx.lineTo(m.x, m.y);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.fillStyle =
-        m.hue === "purple"
-          ? "rgba(180, 110, 255, 0.95)"
-          : m.hue === "white"
-            ? "rgba(255, 255, 255, 0.95)"
-            : m.hue === "yellow"
-              ? "rgba(252, 238, 10, 0.9)"
-              : "rgba(0, 229, 255, 0.9)";
-      ctx.arc(m.x, m.y, m.width * 1.15, 0, Math.PI * 2);
-      ctx.fill();
+    const colorFor = (hue: Shard["hue"], a: number) => {
+      if (hue === "cyan") return `rgba(0, 153, 204, ${a})`;
+      if (hue === "magenta") return `rgba(212, 20, 122, ${a})`;
+      return `rgba(255, 255, 255, ${a})`;
     };
 
     const draw = () => {
@@ -138,57 +97,81 @@ export function CursorTrail() {
 
       const dx = mx - prevMx;
       const dy = my - prevMy;
+      const moveSpeed = Math.hypot(dx, dy);
       prevMx = mx;
       prevMy = my;
 
-      const moveSpeed = Math.hypot(dx, dy);
-      if (moveSpeed > 1.5) {
-        sparks.push({
-          x: mx,
-          y: my,
-          life: 1,
-          vx: -dx * 0.08 + (Math.random() - 0.5) * 0.8,
-          vy: -dy * 0.08 + (Math.random() - 0.5) * 0.8,
-          purple: Math.random() > 0.45,
-        });
-        if (sparks.length > 48) sparks.splice(0, sparks.length - 48);
+      // Drag lag — short trailing follow
+      dragX += (mx - dragX) * 0.38;
+      dragY += (my - dragY) * 0.38;
+
+      trail.unshift({ x: dragX, y: dragY, life: 1 });
+      if (trail.length > TRAIL_MAX) trail.pop();
+
+      burstCooldown -= 1;
+      if (moveSpeed > 2.2 && burstCooldown <= 0) {
+        spawnBurst(mx, my, moveSpeed);
+        burstCooldown = 2;
       }
 
-      for (const m of meteors) {
-        m.vx += (mx - m.x) * m.lag;
-        m.vy += (my - m.y) * m.lag;
-        m.vx *= 0.78;
-        m.vy *= 0.78;
-        m.x += m.vx;
-        m.y += m.vy;
-        drawMeteor(m);
+      // Short drag ribbon
+      if (trail.length > 1) {
+        for (let i = 0; i < trail.length - 1; i += 1) {
+          const a = trail[i];
+          const b = trail[i + 1];
+          const alpha = (1 - i / trail.length) * 0.55;
+          const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+          grad.addColorStop(0, `rgba(0, 153, 204, ${alpha})`);
+          grad.addColorStop(1, `rgba(212, 20, 122, ${alpha * 0.6})`);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = Math.max(1.2, 3.2 - i * 0.22);
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
       }
 
-      for (let i = sparks.length - 1; i >= 0; i -= 1) {
-        const s = sparks[i];
-        s.life -= 0.04;
+      // Outward burst shards (short length)
+      for (let i = shards.length - 1; i >= 0; i -= 1) {
+        const s = shards[i];
         s.x += s.vx;
         s.y += s.vy;
+        s.vx *= 0.9;
+        s.vy *= 0.9;
+        s.life -= 0.055;
         if (s.life <= 0) {
-          sparks.splice(i, 1);
+          shards.splice(i, 1);
           continue;
         }
+        const speed = Math.hypot(s.vx, s.vy) || 0.001;
+        const ux = s.vx / speed;
+        const uy = s.vy / speed;
+        const len = s.len * s.life;
+        const tx = s.x - ux * len;
+        const ty = s.y - uy * len;
+        const grad = ctx.createLinearGradient(tx, ty, s.x, s.y);
+        grad.addColorStop(0, colorFor(s.hue, 0));
+        grad.addColorStop(1, colorFor(s.hue, s.life * 0.9));
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
-        ctx.fillStyle = s.purple
-          ? `rgba(168, 85, 255, ${s.life * 0.55})`
-          : `rgba(255, 255, 255, ${s.life * 0.55})`;
-        ctx.arc(s.x, s.y, 1.7 * s.life, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(s.x, s.y);
+        ctx.stroke();
       }
 
+      // Core pointer
       ctx.beginPath();
-      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
       ctx.arc(mx, my, 2.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.fillStyle = "rgba(168, 85, 255, 0.55)";
-      ctx.arc(mx, my, 4.2, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 153, 204, 0.85)";
+      ctx.lineWidth = 1.5;
+      ctx.arc(mx, my, 5, 0, Math.PI * 2);
+      ctx.stroke();
 
       raf = requestAnimationFrame(draw);
     };
@@ -209,7 +192,7 @@ export function CursorTrail() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[95] mix-blend-screen"
+      className="pointer-events-none fixed inset-0 z-[95]"
       aria-hidden
     />
   );

@@ -77,12 +77,12 @@ export function PlatformShell({
               src={bgImage}
               alt=""
               fill
-              className="object-cover opacity-20 transition-opacity duration-500"
+              className="object-cover opacity-25 transition-opacity duration-500"
               sizes="100vw"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-gvg-bg/60 via-gvg-bg/80 to-gvg-bg" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_15%,rgba(168,85,255,0.15),transparent_42%)]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-gvg-bg/50 via-gvg-bg/78 to-gvg-bg" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_15%,rgba(0,153,204,0.12),transparent_42%)]" />
           </div>
         ) : null}
         <div className="relative z-10">

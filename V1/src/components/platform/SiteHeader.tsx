@@ -44,7 +44,7 @@ export function SiteHeader({
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gvg-yellow/15 bg-gvg-bg/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-gvg-cyan/20 bg-gvg-bg/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-6">
         <Link
           href="/"
@@ -52,11 +52,11 @@ export function SiteHeader({
           onMouseEnter={() => onNavHover?.("/")}
           className="flex items-center gap-3"
         >
-          <span className="grid size-9 place-items-center border border-gvg-yellow bg-gvg-yellow/10 font-display text-xs text-gvg-yellow">
+          <span className="grid size-9 place-items-center border border-gvg-cyan bg-gvg-cyan/10 font-display text-xs text-gvg-cyan">
             GVG
           </span>
           <span>
-            <span className="block font-display text-sm tracking-[0.2em] text-gvg-yellow">
+            <span className="block font-display text-sm tracking-[0.2em] text-gvg-ink">
               GVG OS
             </span>
             <span className="block font-mono text-[10px] tracking-[0.16em] text-gvg-muted">
@@ -82,8 +82,8 @@ export function SiteHeader({
               className={cn(
                 "px-2 py-1 font-hud text-[10px] tracking-[0.16em] transition",
                 pathname === item.href || pathname?.startsWith(`${item.href}/`)
-                  ? "bg-gvg-yellow text-black"
-                  : "text-gvg-muted hover:text-gvg-purple",
+                  ? "bg-gvg-cyan text-white"
+                  : "text-gvg-muted hover:text-gvg-magenta",
               )}
             >
               {item.title.split(" ")[0]}

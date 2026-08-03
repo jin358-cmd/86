@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --gvg-yellow: #fcee0a;
-  --gvg-bg: #080808;
-  --gvg-panel: #111111;
-  --gvg-cyan: #00e5ff;
-  --gvg-purple: #a855ff;
-  --gvg-danger: #ff1744;
-  --gvg-text: #ececec;
-  --gvg-muted: #8b8b8b;
+  /* Light cyberpunk palette */
+  --gvg-yellow: #e8c200;
+  --gvg-bg: #eef3f8;
+  --gvg-panel: #ffffff;
+  --gvg-cyan: #0099cc;
+  --gvg-magenta: #d4147a;
+  --gvg-purple: #7b5cff;
+  --gvg-danger: #e11d48;
+  --gvg-text: #1a2332;
+  --gvg-ink: #0d1520;
+  --gvg-muted: #5b6b7c;
 }
 
 @theme inline {
@@ -16,9 +19,11 @@
   --color-gvg-bg: var(--gvg-bg);
   --color-gvg-panel: var(--gvg-panel);
   --color-gvg-cyan: var(--gvg-cyan);
+  --color-gvg-magenta: var(--gvg-magenta);
   --color-gvg-purple: var(--gvg-purple);
   --color-gvg-danger: var(--gvg-danger);
   --color-gvg-text: var(--gvg-text);
+  --color-gvg-ink: var(--gvg-ink);
   --color-gvg-muted: var(--gvg-muted);
   --font-display: var(--font-orbitron);
   --font-hud: var(--font-rajdhani);
@@ -41,11 +46,16 @@ body {
 body {
   font-family: var(--font-body), sans-serif;
   overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 12% 8%, rgba(0, 153, 204, 0.12), transparent 42%),
+    radial-gradient(ellipse at 88% 18%, rgba(212, 20, 122, 0.08), transparent 38%),
+    linear-gradient(180deg, #f7fbff 0%, #eef3f8 45%, #e6edf5 100%);
+  background-attachment: fixed;
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--gvg-yellow) 35%, transparent);
-  color: #000;
+  background: color-mix(in oklab, var(--gvg-cyan) 35%, transparent);
+  color: #fff;
 }
 
 .font-display {
@@ -65,16 +75,16 @@ body {
 }
 
 .glass-panel {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(13, 21, 32, 0.08);
   background: linear-gradient(
     160deg,
-    rgba(17, 17, 17, 0.78),
-    rgba(8, 8, 8, 0.55)
+    rgba(255, 255, 255, 0.92),
+    rgba(240, 246, 252, 0.78)
   );
-  backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.15);
   box-shadow:
-    0 0 0 1px rgba(252, 238, 10, 0.04) inset,
-    0 10px 40px rgba(0, 0, 0, 0.35);
+    0 0 0 1px rgba(0, 153, 204, 0.06) inset,
+    0 12px 36px rgba(13, 21, 32, 0.08);
 }
 
 .interactive-card {
@@ -85,9 +95,9 @@ body {
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent 2px,
-    rgba(0, 0, 0, 0.2) 2px,
-    rgba(0, 0, 0, 0.2) 4px
+    transparent 3px,
+    rgba(0, 153, 204, 0.035) 3px,
+    rgba(0, 153, 204, 0.035) 4px
   );
   mix-blend-mode: multiply;
   animation: scan-drift 8s linear infinite;
@@ -105,7 +115,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  border: 1px solid rgba(252, 238, 10, 0.28);
+  border: 1px solid rgba(0, 153, 204, 0.28);
 }
 
 .hud-rings .ring-a {
@@ -116,14 +126,14 @@ body {
 
 .hud-rings .ring-b {
   inset: 16%;
-  border-color: rgba(0, 229, 255, 0.35);
+  border-color: rgba(212, 20, 122, 0.28);
   animation: spin-rev 12s linear infinite;
 }
 
 .hud-rings .ring-c {
   inset: 28%;
   border-width: 2px;
-  border-color: rgba(252, 238, 10, 0.65);
+  border-color: rgba(0, 153, 204, 0.55);
   border-top-color: transparent;
   border-left-color: transparent;
   animation: spin 7s linear infinite;
@@ -194,11 +204,11 @@ body {
     filter: none;
   }
   30% {
-    filter: hue-rotate(12deg) contrast(1.15) saturate(1.3);
+    filter: hue-rotate(12deg) contrast(1.08) saturate(1.15);
     transform: scale(1.01) skewX(0.4deg);
   }
   60% {
-    filter: hue-rotate(-8deg) contrast(1.2);
+    filter: hue-rotate(-8deg) contrast(1.1);
     transform: scale(1.015) skewX(-0.4deg);
   }
 }

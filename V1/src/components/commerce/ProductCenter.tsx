@@ -85,7 +85,7 @@ export function ProductCenter() {
       seller: seller.trim(),
       role,
       region,
-      image: "/images/products/product-device.png",
+      image: active.image,
       tags: ["New", ROLE_LABEL[role]],
     };
 
@@ -121,17 +121,17 @@ export function ProductCenter() {
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gvg-bg/70 via-gvg-bg/85 to-gvg-bg" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(168,85,255,0.18),transparent_40%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-gvg-bg/55 via-gvg-bg/82 to-gvg-bg" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(0,153,204,0.14),transparent_40%)]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
         <p className="font-mono text-xs tracking-[0.35em] text-gvg-cyan">
           MODULE 07C · PRODUCT CENTER
         </p>
-        <h1 className="mt-3 font-display text-4xl tracking-[0.12em] text-gvg-yellow md:text-5xl">
-          PRODUCT CENTER
-        </h1>
+      <h1 className="mt-3 font-display text-4xl tracking-[0.12em] text-gvg-ink md:text-5xl">
+        PRODUCT CENTER
+      </h1>
         <p className="mt-2 font-hud text-lg text-gvg-text">商品中心</p>
         <p className="mt-4 max-w-3xl font-body text-gvg-muted">
           瀏覽分類使用實景照片 Banner。滑鼠移至分類時背景同步切換。廠家 /
@@ -152,8 +152,8 @@ export function ProductCenter() {
               onClick={() => switchCategory(cat.id, cat.image)}
               className={`group relative aspect-[16/7] overflow-hidden border text-left transition ${
                 activeCat === cat.id
-                  ? "border-gvg-yellow/80"
-                  : "border-white/10 hover:border-gvg-purple/60"
+                  ? "border-gvg-cyan/80"
+                  : "border-black/10 hover:border-gvg-magenta/50"
               }`}
             >
               <Image
@@ -192,8 +192,8 @@ export function ProductCenter() {
                       onClick={() => switchCategory(cat.id, cat.image)}
                       className={`flex w-full items-center justify-between px-2 py-1.5 text-left font-hud text-xs tracking-[0.12em] transition ${
                         activeCat === cat.id
-                          ? "bg-gvg-yellow text-black"
-                          : "text-gvg-muted hover:text-gvg-purple"
+                          ? "bg-gvg-cyan text-white"
+                          : "text-gvg-muted hover:text-gvg-magenta"
                       }`}
                     >
                       <span>{cat.zh}</span>
@@ -249,19 +249,19 @@ export function ProductCenter() {
                 <input
                   value={priceMin}
                   onChange={(e) => setPriceMin(e.target.value)}
-                  className="w-full border border-white/15 bg-black/40 px-2 py-1 font-mono text-xs text-gvg-text"
+                  className="w-full border border-black/10 bg-white/80 px-2 py-1 font-mono text-xs text-gvg-text"
                 />
                 <span className="text-gvg-muted">–</span>
                 <input
                   value={priceMax}
                   onChange={(e) => setPriceMax(e.target.value)}
-                  className="w-full border border-white/15 bg-black/40 px-2 py-1 font-mono text-xs text-gvg-text"
+                  className="w-full border border-black/10 bg-white/80 px-2 py-1 font-mono text-xs text-gvg-text"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => playTone("confirm")}
-                className="mt-2 w-full border border-gvg-purple/50 py-1.5 font-hud text-[10px] tracking-[0.2em] text-gvg-purple"
+                className="mt-2 w-full border border-gvg-cyan/50 py-1.5 font-hud text-[10px] tracking-[0.2em] text-gvg-cyan"
               >
                 確定
               </button>

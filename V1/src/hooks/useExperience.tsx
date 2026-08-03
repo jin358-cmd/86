@@ -27,14 +27,6 @@ import {
 } from "@/lib/audio";
 import type { MissionId } from "@/data/content";
 
-export type GeoStatus = "idle" | "pending" | "granted" | "denied" | "unavailable";
-
-export type GeoPosition = {
-  lat: number;
-  lon: number;
-  accuracy: number | null;
-};
-
 type ExperienceContextValue = {
   scene: SceneId;
   sceneIndex: number;
@@ -48,11 +40,6 @@ type ExperienceContextValue = {
   toggleMute: () => void;
   begin: () => Promise<void>;
   started: boolean;
-  geoStatus: GeoStatus;
-  geo: GeoPosition | null;
-  locationConfirmed: boolean;
-  confirmLocation: () => void;
-  requestLocation: () => void;
 };
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
@@ -63,9 +50,6 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [transitioning, setTransitioning] = useState(false);
   const [selectedMission, setSelectedMission] = useState<MissionId>("landing");
   const [muted, setMutedState] = useState(false);
-  const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
-  const [geo, setGeo] = useState<GeoPosition | null>(null);
-  const [locationConfirmed, setLocationConfirmed] = useState(false);
 
   const sceneIndex = SCENES.indexOf(scene);
 
@@ -103,35 +87,6 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
 
   const selectMission = useCallback((id: MissionId) => {
     setSelectedMission(id);
-    playTone("confirm");
-  }, []);
-
-  const requestLocation = useCallback(() => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setGeoStatus("unavailable");
-      return;
-    }
-    setGeoStatus("pending");
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setGeo({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          accuracy: pos.coords.accuracy ?? null,
-        });
-        setGeoStatus("granted");
-        playTone("confirm");
-      },
-      () => {
-        setGeoStatus("denied");
-        playTone("warn");
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
-    );
-  }, []);
-
-  const confirmLocation = useCallback(() => {
-    setLocationConfirmed(true);
     playTone("confirm");
   }, []);
 
@@ -186,11 +141,6 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       toggleMute,
       begin,
       started,
-      geoStatus,
-      geo,
-      locationConfirmed,
-      confirmLocation,
-      requestLocation,
     }),
     [
       scene,
@@ -205,11 +155,6 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       toggleMute,
       begin,
       started,
-      geoStatus,
-      geo,
-      locationConfirmed,
-      confirmLocation,
-      requestLocation,
     ],
   );
 
