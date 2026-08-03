@@ -31,7 +31,7 @@ function SceneStage() {
 
   return (
     <>
-      <Atmosphere homeStreaks />
+      <Atmosphere />
       <CursorTrail />
       <ChromeHud />
       <StartGate />
@@ -49,8 +49,6 @@ function SceneStage() {
               : ""
           }
         >
-          {/* Magenta elongated streaks on cinematic homepage path */}
-          <div className="pointer-events-none fixed inset-0 z-[1] gvg-magenta-streaks opacity-50" />
           {(scene === "boot" || scene === "wear" || scene === "login") && (
             <FloatingDust />
           )}

@@ -52,23 +52,23 @@ export function playTone(kind: ToneKind = "ui") {
     ToneKind,
     { type: OscillatorType; f: number; dur: number; vol: number }
   > = {
-    boot: { type: "sawtooth", f: 180, dur: 0.18, vol: 0.025 },
-    ui: { type: "sine", f: 920, dur: 0.05, vol: 0.015 },
-    confirm: { type: "triangle", f: 540, dur: 0.12, vol: 0.022 },
-    warn: { type: "square", f: 240, dur: 0.1, vol: 0.016 },
-    whoosh: { type: "sine", f: 140, dur: 0.32, vol: 0.028 },
-    flow: { type: "sine", f: 660, dur: 0.22, vol: 0.012 },
+    boot: { type: "triangle", f: 320, dur: 0.14, vol: 0.02 },
+    ui: { type: "sine", f: 1040, dur: 0.045, vol: 0.012 },
+    confirm: { type: "sine", f: 660, dur: 0.1, vol: 0.016 },
+    warn: { type: "square", f: 240, dur: 0.1, vol: 0.014 },
+    whoosh: { type: "sine", f: 280, dur: 0.28, vol: 0.02 },
+    flow: { type: "sine", f: 784, dur: 0.16, vol: 0.01 },
   };
 
   const p = presets[kind];
   osc.type = p.type;
   osc.frequency.setValueAtTime(p.f, now);
   if (kind === "whoosh") {
-    osc.frequency.exponentialRampToValueAtTime(40, now + p.dur);
+    osc.frequency.exponentialRampToValueAtTime(90, now + p.dur);
   } else if (kind === "confirm") {
-    osc.frequency.exponentialRampToValueAtTime(p.f * 1.55, now + p.dur);
+    osc.frequency.exponentialRampToValueAtTime(p.f * 1.45, now + p.dur);
   } else if (kind === "flow") {
-    osc.frequency.exponentialRampToValueAtTime(p.f * 1.35, now + p.dur);
+    osc.frequency.exponentialRampToValueAtTime(p.f * 1.25, now + p.dur);
   }
 
   gain.gain.setValueAtTime(0.0001, now);
@@ -79,8 +79,7 @@ export function playTone(kind: ToneKind = "ui") {
 }
 
 /**
- * Continuous tech-flowing ambient BGM:
- * low drone + sweeping filter + soft arpeggio + data-tick shimmer
+ * Light, brisk flowing tech BGM — brighter arps, soft pulse, airy pad
  */
 export function startAmbience() {
   if (muted || ambienceNodes) return;
@@ -88,137 +87,126 @@ export function startAmbience() {
   if (!c) return;
 
   const master = c.createGain();
-  master.gain.value = 0.032;
+  master.gain.value = 0.026;
   master.connect(c.destination);
 
   const filter = c.createBiquadFilter();
   filter.type = "lowpass";
-  filter.frequency.value = 720;
-  filter.Q.value = 0.9;
+  filter.frequency.value = 1400;
+  filter.Q.value = 0.55;
   filter.connect(master);
 
-  // Slow sweeping filter = "flowing" tech feel
+  // Gentle breeze sweep
   const sweep = c.createOscillator();
-  sweep.frequency.value = 0.07;
+  sweep.frequency.value = 0.14;
   const sweepGain = c.createGain();
-  sweepGain.gain.value = 480;
+  sweepGain.gain.value = 520;
   sweep.connect(sweepGain);
   sweepGain.connect(filter.frequency);
-  filter.frequency.setValueAtTime(720, c.currentTime);
+  filter.frequency.setValueAtTime(1400, c.currentTime);
 
-  const drone = c.createOscillator();
-  drone.type = "sine";
-  drone.frequency.value = 55;
-  const droneGain = c.createGain();
-  droneGain.gain.value = 0.42;
-  drone.connect(droneGain);
-  droneGain.connect(filter);
+  // Light airy pad (higher, softer)
+  const pad = c.createOscillator();
+  pad.type = "sine";
+  pad.frequency.value = 196;
+  const padGain = c.createGain();
+  padGain.gain.value = 0.12;
+  pad.connect(padGain);
+  padGain.connect(filter);
 
-  const sub = c.createOscillator();
-  sub.type = "triangle";
-  sub.frequency.value = 82.5;
-  const subGain = c.createGain();
-  subGain.gain.value = 0.16;
-  sub.connect(subGain);
-  subGain.connect(filter);
+  const pad2 = c.createOscillator();
+  pad2.type = "triangle";
+  pad2.frequency.value = 246.94; // B3
+  const pad2Gain = c.createGain();
+  pad2Gain.gain.value = 0.07;
+  pad2.connect(pad2Gain);
+  pad2Gain.connect(filter);
 
+  // Brisk soft pulse
   const pulse = c.createOscillator();
-  pulse.type = "triangle";
-  pulse.frequency.value = 110;
+  pulse.type = "sine";
+  pulse.frequency.value = 392;
   const pulseGain = c.createGain();
-  pulseGain.gain.value = 0.08;
+  pulseGain.gain.value = 0.03;
   const lfo = c.createOscillator();
-  lfo.frequency.value = 0.42;
+  lfo.frequency.value = 1.6; // livelier
   const lfoGain = c.createGain();
-  lfoGain.gain.value = 0.07;
+  lfoGain.gain.value = 0.028;
   lfo.connect(lfoGain);
   lfoGain.connect(pulseGain.gain);
   pulse.connect(pulseGain);
-  pulseGain.connect(filter);
+  pulseGain.connect(master);
 
-  // Flowing arpeggio bed
+  // Bright flowing arpeggio
   const arp = c.createOscillator();
   arp.type = "sine";
-  arp.frequency.value = 220;
+  arp.frequency.value = 523.25; // C5
   const arpGain = c.createGain();
-  arpGain.gain.value = 0.035;
+  arpGain.gain.value = 0.028;
   const arpLfo = c.createOscillator();
-  arpLfo.frequency.value = 3.2;
+  arpLfo.frequency.value = 4.8;
   const arpLfoGain = c.createGain();
-  arpLfoGain.gain.value = 0.03;
+  arpLfoGain.gain.value = 0.024;
   arpLfo.connect(arpLfoGain);
   arpLfoGain.connect(arpGain.gain);
-  // gentle pitch drift
   const arpDrift = c.createOscillator();
-  arpDrift.frequency.value = 0.11;
+  arpDrift.frequency.value = 0.25;
   const arpDriftGain = c.createGain();
-  arpDriftGain.gain.value = 28;
+  arpDriftGain.gain.value = 48;
   arpDrift.connect(arpDriftGain);
   arpDriftGain.connect(arp.frequency);
   arp.connect(arpGain);
   arpGain.connect(master);
 
-  const shimmer = c.createOscillator();
-  shimmer.type = "sine";
-  shimmer.frequency.value = 440;
-  const shimmerGain = c.createGain();
-  shimmerGain.gain.value = 0.014;
-  const shimLfo = c.createOscillator();
-  shimLfo.frequency.value = 0.22;
-  const shimLfoGain = c.createGain();
-  shimLfoGain.gain.value = 0.01;
-  shimLfo.connect(shimLfoGain);
-  shimLfoGain.connect(shimmerGain.gain);
-  shimmer.connect(shimmerGain);
-  shimmerGain.connect(master);
+  // High sparkle
+  const sparkle = c.createOscillator();
+  sparkle.type = "sine";
+  sparkle.frequency.value = 784;
+  const sparkleGain = c.createGain();
+  sparkleGain.gain.value = 0.01;
+  const sparkLfo = c.createOscillator();
+  sparkLfo.frequency.value = 2.2;
+  const sparkLfoGain = c.createGain();
+  sparkLfoGain.gain.value = 0.008;
+  sparkLfo.connect(sparkLfoGain);
+  sparkLfoGain.connect(sparkleGain.gain);
+  sparkle.connect(sparkleGain);
+  sparkleGain.connect(master);
 
-  // Soft noise bed via detuned high sine as data stream
-  const data = c.createOscillator();
-  data.type = "square";
-  data.frequency.value = 880;
-  const dataGain = c.createGain();
-  dataGain.gain.value = 0.004;
-  const dataFilter = c.createBiquadFilter();
-  dataFilter.type = "bandpass";
-  dataFilter.frequency.value = 1200;
-  dataFilter.Q.value = 4;
-  const dataLfo = c.createOscillator();
-  dataLfo.frequency.value = 5.5;
-  const dataLfoGain = c.createGain();
-  dataLfoGain.gain.value = 0.0035;
-  dataLfo.connect(dataLfoGain);
-  dataLfoGain.connect(dataGain.gain);
-  data.connect(dataFilter);
-  dataFilter.connect(dataGain);
-  dataGain.connect(master);
+  // Soft fifth for lift
+  const fifth = c.createOscillator();
+  fifth.type = "sine";
+  fifth.frequency.value = 293.66;
+  const fifthGain = c.createGain();
+  fifthGain.gain.value = 0.05;
+  fifth.connect(fifthGain);
+  fifthGain.connect(filter);
 
-  drone.start();
-  sub.start();
+  pad.start();
+  pad2.start();
   pulse.start();
   lfo.start();
   arp.start();
   arpLfo.start();
   arpDrift.start();
-  shimmer.start();
-  shimLfo.start();
-  data.start();
-  dataLfo.start();
+  sparkle.start();
+  sparkLfo.start();
+  fifth.start();
   sweep.start();
 
   ambienceNodes = {
     stop: () => {
       try {
-        drone.stop();
-        sub.stop();
+        pad.stop();
+        pad2.stop();
         pulse.stop();
         lfo.stop();
         arp.stop();
         arpLfo.stop();
         arpDrift.stop();
-        shimmer.stop();
-        shimLfo.stop();
-        data.stop();
-        dataLfo.stop();
+        sparkle.stop();
+        sparkLfo.stop();
+        fifth.stop();
         sweep.stop();
       } catch {
         /* already stopped */
@@ -234,16 +222,16 @@ export function stopAmbience() {
   ambienceNodes = null;
 }
 
-/** Soft flowing tech ticks while experience is active */
+/** Light flowing ticks */
 export function startSfxLoop() {
   if (muted || sfxLoopId !== null) return;
-  const sequence: ToneKind[] = ["flow", "ui", "flow", "confirm", "flow", "whoosh"];
+  const sequence: ToneKind[] = ["flow", "ui", "flow", "confirm", "flow", "ui"];
   let i = 0;
   sfxLoopId = window.setInterval(() => {
     if (muted) return;
     playTone(sequence[i % sequence.length]);
     i += 1;
-  }, 3600);
+  }, 2800);
 }
 
 export function stopSfxLoop() {

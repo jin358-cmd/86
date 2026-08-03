@@ -7,13 +7,14 @@ import { SCENE_META, type SceneId } from "@/lib/experience";
 
 const ORBITS = [
   { r: 120, dur: 14, count: 6, color: "bg-gvg-cyan" },
-  { r: 170, dur: 22, count: 8, color: "bg-gvg-magenta" },
+  { r: 170, dur: 22, count: 8, color: "bg-gvg-cyan/70" },
   { r: 220, dur: 30, count: 5, color: "bg-white" },
 ] as const;
 
 export function StartGate() {
   const { begin, started } = useExperience();
   const [bursting, setBursting] = useState(false);
+  const [hovering, setHovering] = useState(false);
   const [stars] = useState(() =>
     Array.from({ length: 60 }, (_, i) => ({
       id: i,
@@ -46,17 +47,14 @@ export function StartGate() {
     setBursting(true);
     window.setTimeout(() => {
       void begin();
-    }, 650);
+    }, 520);
   };
 
   return (
     <div className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-[#070b14] px-6">
-      {/* Cosmos field */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#12203a_0%,#070b14_62%,#04060c_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(0,153,204,0.22),transparent_40%),radial-gradient(circle_at_78%_65%,rgba(212,20,122,0.2),transparent_42%)]" />
-        {/* Magenta elongated streaks */}
-        <div className="gvg-magenta-streaks absolute inset-0 opacity-80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_28%,rgba(0,153,204,0.2),transparent_42%),radial-gradient(circle_at_72%_70%,rgba(0,180,220,0.1),transparent_40%)]" />
         {stars.map((s) => (
           <span
             key={s.id}
@@ -71,13 +69,9 @@ export function StartGate() {
             }}
           />
         ))}
-        {/* Soft nebula bands */}
-        <div className="absolute left-[-10%] top-[18%] h-24 w-[120%] rotate-[-8deg] bg-gradient-to-r from-transparent via-gvg-magenta/25 to-transparent blur-2xl" />
-        <div className="absolute left-[-5%] top-[58%] h-16 w-[110%] rotate-[6deg] bg-gradient-to-r from-transparent via-gvg-purple/20 to-transparent blur-xl" />
       </div>
 
-      <div className="relative z-10 flex max-w-2xl flex-col items-center text-center">
-        {/* Orbital ring system around copy */}
+      <div className="relative z-10 flex max-w-3xl flex-col items-center text-center">
         <div className="relative mb-2 grid place-items-center px-10 py-16 md:px-16 md:py-20">
           <div className="pointer-events-none absolute inset-0 grid place-items-center">
             {ORBITS.map((o) => (
@@ -110,49 +104,66 @@ export function StartGate() {
             ))}
           </div>
 
-          <p className="relative z-10 font-mono text-base tracking-[0.42em] text-gvg-cyan md:text-xl lg:text-2xl">
-            GVG OS · GLOBAL PLATFORM
+          {/* Title stack — proportion & color hierarchy */}
+          <p className="relative z-10 font-mono text-[11px] font-medium tracking-[0.55em] text-gvg-cyan/90 md:text-sm md:tracking-[0.62em]">
+            GVG OS
+            <span className="mx-2 text-white/35">·</span>
+            <span className="text-white/75">GLOBAL PLATFORM</span>
           </p>
-          <h1 className="relative z-10 mt-5 font-display text-4xl tracking-[0.14em] text-white md:text-6xl lg:text-7xl">
-            START EXPERIENCE
+          <h1 className="relative z-10 mt-6 font-display text-[2.35rem] leading-[1.05] tracking-[0.18em] text-white md:text-6xl md:tracking-[0.2em] lg:text-[4.25rem]">
+            START
+            <span className="mt-1 block text-[0.72em] tracking-[0.28em] text-gvg-cyan">
+              EXPERIENCE
+            </span>
           </h1>
-          <p className="relative z-10 mt-5 max-w-md font-body text-sm text-white/70 md:text-base">
-            科幻宇宙入口。點擊後以第一人稱視角穿越章節結點：Boot → Wear → Login
-            → City → World → Dashboard。
+          <p className="relative z-10 mt-6 max-w-md font-body text-sm leading-relaxed text-white/55 md:text-[15px]">
+            科幻宇宙入口。以第一人稱穿越章節結點：Boot → Wear → Login → City →
+            World → Dashboard。
           </p>
         </div>
 
-        <div className="relative mt-2">
-          {/* Radial diffusion rings from button */}
-          <span className="init-pulse-ring" />
-          <span className="init-pulse-ring delay-1" />
-          <span className="init-pulse-ring delay-2" />
+        <div
+          className="relative mt-4"
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+        >
+          {/* Hover-only same-color radiate from rectangular button */}
+          {hovering && !bursting ? (
+            <>
+              <span className="init-pulse-ring init-cyan" />
+              <span className="init-pulse-ring init-cyan delay-1" />
+              <span className="init-pulse-ring init-cyan delay-2" />
+            </>
+          ) : null}
+
+          {/* Fine click burst */}
           {bursting && (
             <>
               <motion.span
-                className="absolute left-1/2 top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gvg-cyan"
-                initial={{ scale: 1, opacity: 0.9 }}
-                animate={{ scale: 28, opacity: 0 }}
-                transition={{ duration: 0.7, ease: "easeOut" }}
+                className="absolute left-1/2 top-1/2 h-px w-px -translate-x-1/2 -translate-y-1/2 rounded-full border border-gvg-cyan/80"
+                initial={{ scale: 1, opacity: 0.9, borderWidth: 1 }}
+                animate={{ scale: 90, opacity: 0, borderWidth: 0.5 }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
               />
               <motion.span
-                className="absolute left-1/2 top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gvg-magenta"
-                initial={{ scale: 1, opacity: 0.7 }}
-                animate={{ scale: 36, opacity: 0 }}
-                transition={{ duration: 0.85, ease: "easeOut", delay: 0.05 }}
+                className="absolute left-1/2 top-1/2 h-px w-px -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70"
+                initial={{ scale: 1, opacity: 0.7, borderWidth: 0.5 }}
+                animate={{ scale: 120, opacity: 0 }}
+                transition={{ duration: 0.7, ease: "easeOut", delay: 0.04 }}
               />
             </>
           )}
+
           <button
             type="button"
             onClick={onInitialize}
             disabled={bursting}
-            className="relative z-10 border border-gvg-cyan bg-gvg-cyan px-10 py-3.5 font-display text-sm tracking-[0.32em] text-white shadow-[0_0_28px_rgba(0,153,204,0.45)] transition hover:bg-transparent hover:text-gvg-cyan disabled:opacity-80"
+            className="relative z-10 border border-gvg-cyan bg-gvg-cyan px-12 py-3.5 font-display text-sm tracking-[0.34em] text-white shadow-[0_0_24px_rgba(0,153,204,0.4)] transition hover:bg-gvg-cyan/90 disabled:opacity-80"
           >
             INITIALIZE
           </button>
         </div>
-        <p className="mt-6 font-mono text-[10px] tracking-[0.28em] text-white/45">
+        <p className="mt-6 font-mono text-[10px] tracking-[0.3em] text-white/40">
           AUDIO + VISUAL SYSTEMS WILL ENGAGE
         </p>
       </div>
@@ -160,7 +171,6 @@ export function StartGate() {
   );
 }
 
-/** First-person chapter node transit between scenes */
 export function FirstPersonTransit({
   from,
   to,
@@ -188,8 +198,6 @@ export function FirstPersonTransit({
   return (
     <div className="pointer-events-none fixed inset-0 z-[105] overflow-hidden bg-[#05080f]">
       <div className="fp-tunnel absolute inset-0" />
-      <div className="gvg-magenta-streaks absolute inset-0 opacity-70" />
-      {/* Rushing star lines (first person) */}
       {Array.from({ length: 24 }).map((_, i) => (
         <span
           key={i}
@@ -211,7 +219,7 @@ export function FirstPersonTransit({
           className="relative grid place-items-center"
         >
           <span className="absolute size-40 rounded-full border border-gvg-cyan/40 animate-pulse-ring" />
-          <span className="absolute size-24 rounded-full border border-gvg-magenta/50" />
+          <span className="absolute size-24 rounded-full border border-white/30" />
           <div className="relative z-10 text-center">
             <p className="font-mono text-[10px] tracking-[0.4em] text-gvg-cyan">
               NODE EXIT · {fromLabel}
@@ -219,7 +227,7 @@ export function FirstPersonTransit({
             <p className="mt-3 font-display text-3xl tracking-[0.22em] text-white md:text-5xl">
               {label}
             </p>
-            <p className="mt-2 font-mono text-[10px] tracking-[0.35em] text-gvg-magenta">
+            <p className="mt-2 font-mono text-[10px] tracking-[0.35em] text-white/55">
               NODE ENTER · FIRST PERSON
             </p>
           </div>

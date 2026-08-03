@@ -2,10 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-type TrailPoint = {
-  x: number;
-  y: number;
-};
+type TrailPoint = { x: number; y: number };
 
 type Shard = {
   x: number;
@@ -14,12 +11,12 @@ type Shard = {
   vy: number;
   life: number;
   len: number;
-  hue: "cyan" | "magenta" | "white";
+  r: number;
+  g: number;
+  b: number;
 };
 
-const TRAIL_MAX = 28;
-const SHARD_BURST = 12;
-
+/** Layer A: elongated comet drag · Layer B: short irregular colored burst */
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -29,10 +26,8 @@ export function CursorTrail() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Always enable custom cursor on fine pointers; also on coarse if user moves
     document.body.classList.add("gvg-cursor-active");
 
     let w = 0;
@@ -42,11 +37,24 @@ export function CursorTrail() {
     let prevMx = mx;
     let prevMy = my;
     let raf = 0;
-    let dragX = mx;
-    let dragY = my;
+    // Layer 1 — comet head lag
+    let headX = mx;
+    let headY = my;
+    // Layer 2 — longer tail lag
+    let tailX = mx;
+    let tailY = my;
     const trail: TrailPoint[] = [];
     const shards: Shard[] = [];
     let burstCooldown = 0;
+
+    const palette = [
+      [0, 153, 204],
+      [212, 20, 122],
+      [123, 92, 255],
+      [255, 255, 255],
+      [0, 220, 180],
+      [255, 180, 80],
+    ] as const;
 
     const resize = () => {
       w = window.innerWidth;
@@ -60,33 +68,30 @@ export function CursorTrail() {
     };
 
     const spawnBurst = (x: number, y: number, speed: number) => {
-      const count = SHARD_BURST + Math.floor(Math.min(speed / 6, 8));
+      const count = 8 + Math.floor(Math.min(speed / 10, 5));
       for (let i = 0; i < count; i += 1) {
-        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
-        const force = 3.2 + Math.random() * 4.8 + speed * 0.08;
-        const hues: Shard["hue"][] = ["cyan", "magenta", "white"];
+        // Irregular angles — not even spokes
+        const angle = Math.random() * Math.PI * 2;
+        const force = 1.6 + Math.random() * 2.8 + speed * 0.035;
+        const [r, g, b] = palette[Math.floor(Math.random() * palette.length)];
         shards.push({
           x,
           y,
-          vx: Math.cos(angle) * force,
-          vy: Math.sin(angle) * force,
-          life: 1,
-          len: 22 + Math.random() * 28,
-          hue: hues[i % hues.length],
+          vx: Math.cos(angle) * force * (0.7 + Math.random() * 0.8),
+          vy: Math.sin(angle) * force * (0.7 + Math.random() * 0.8),
+          life: 0.55 + Math.random() * 0.35,
+          len: 8 + Math.random() * 12,
+          r,
+          g,
+          b,
         });
       }
-      if (shards.length > 140) shards.splice(0, shards.length - 140);
+      if (shards.length > 100) shards.splice(0, shards.length - 100);
     };
 
     const onMove = (e: PointerEvent) => {
       mx = e.clientX;
       my = e.clientY;
-    };
-
-    const colorFor = (hue: Shard["hue"], a: number) => {
-      if (hue === "cyan") return `rgba(0, 153, 204, ${a})`;
-      if (hue === "magenta") return `rgba(212, 20, 122, ${a})`;
-      return `rgba(255, 255, 255, ${a})`;
     };
 
     const draw = () => {
@@ -98,47 +103,70 @@ export function CursorTrail() {
       prevMx = mx;
       prevMy = my;
 
-      // Longer drag lag for stretched trail
-      dragX += (mx - dragX) * 0.18;
-      dragY += (my - dragY) * 0.18;
+      // Layer 1: comet head (medium lag)
+      headX += (mx - headX) * 0.32;
+      headY += (my - headY) * 0.32;
+      // Layer 2: comet tail (longer lag)
+      tailX += (mx - tailX) * 0.12;
+      tailY += (my - tailY) * 0.12;
 
-      trail.unshift({ x: dragX, y: dragY });
-      if (trail.length > TRAIL_MAX) trail.pop();
+      trail.unshift({ x: headX, y: headY });
+      if (trail.length > 22) trail.pop();
 
       burstCooldown -= 1;
-      if (moveSpeed > 1.4 && burstCooldown <= 0) {
+      if (moveSpeed > 1.6 && burstCooldown <= 0) {
         spawnBurst(mx, my, moveSpeed);
-        burstCooldown = 1;
+        burstCooldown = 2;
       }
 
-      // Elongated drag ribbon
+      // ——— Layer 2: comet drag trail (elongated ribbon) ———
       if (trail.length > 1) {
+        // Soft outer glow path
+        ctx.beginPath();
+        ctx.moveTo(trail[0].x, trail[0].y);
+        for (let i = 1; i < trail.length; i += 1) {
+          ctx.lineTo(trail[i].x, trail[i].y);
+        }
+        ctx.strokeStyle = "rgba(0, 153, 204, 0.12)";
+        ctx.lineWidth = 10;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke();
+
         for (let i = 0; i < trail.length - 1; i += 1) {
           const a = trail[i];
           const b = trail[i + 1];
-          const alpha = (1 - i / trail.length) * 0.7;
+          const t = 1 - i / trail.length;
           const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-          grad.addColorStop(0, `rgba(0, 153, 204, ${alpha})`);
-          grad.addColorStop(0.55, `rgba(212, 20, 122, ${alpha * 0.75})`);
-          grad.addColorStop(1, `rgba(255, 255, 255, ${alpha * 0.35})`);
+          grad.addColorStop(0, `rgba(255,255,255,${t * 0.85})`);
+          grad.addColorStop(0.35, `rgba(0,153,204,${t * 0.7})`);
+          grad.addColorStop(1, `rgba(212,20,122,${t * 0.25})`);
           ctx.strokeStyle = grad;
-          ctx.lineWidth = Math.max(1, 4.2 - i * 0.12);
-          ctx.lineCap = "round";
+          ctx.lineWidth = Math.max(1, 3.6 * t);
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
           ctx.stroke();
         }
+
+        // Tail tip comet nucleus from lagged point
+        const tg = ctx.createRadialGradient(tailX, tailY, 0, tailX, tailY, 14);
+        tg.addColorStop(0, "rgba(0,153,204,0.35)");
+        tg.addColorStop(1, "rgba(0,153,204,0)");
+        ctx.fillStyle = tg;
+        ctx.beginPath();
+        ctx.arc(tailX, tailY, 14, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      // Long outward burst shards
+      // ——— Layer 1: short irregular colored burst ———
       for (let i = shards.length - 1; i >= 0; i -= 1) {
         const s = shards[i];
         s.x += s.vx;
         s.y += s.vy;
-        s.vx *= 0.935;
-        s.vy *= 0.935;
-        s.life -= 0.028;
+        s.vx *= 0.88;
+        s.vy *= 0.88;
+        s.life -= 0.06;
         if (s.life <= 0) {
           shards.splice(i, 1);
           continue;
@@ -146,33 +174,29 @@ export function CursorTrail() {
         const speed = Math.hypot(s.vx, s.vy) || 0.001;
         const ux = s.vx / speed;
         const uy = s.vy / speed;
-        const len = s.len * (0.45 + s.life * 0.55);
+        const len = s.len * s.life;
         const tx = s.x - ux * len;
         const ty = s.y - uy * len;
         const grad = ctx.createLinearGradient(tx, ty, s.x, s.y);
-        grad.addColorStop(0, colorFor(s.hue, 0));
-        grad.addColorStop(1, colorFor(s.hue, s.life * 0.95));
+        grad.addColorStop(0, `rgba(${s.r},${s.g},${s.b},0)`);
+        grad.addColorStop(1, `rgba(${s.r},${s.g},${s.b},${s.life * 0.9})`);
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.7;
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(tx, ty);
         ctx.lineTo(s.x, s.y);
         ctx.stroke();
       }
 
-      // Always-visible core pointer
+      // Pointer core (shared)
       ctx.beginPath();
-      ctx.fillStyle = "rgba(212, 20, 122, 0.35)";
-      ctx.arc(mx, my, 10, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.98)";
+      ctx.arc(mx, my, 2.4, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.fillStyle = "rgba(255, 255, 255, 0.98)";
-      ctx.arc(mx, my, 2.6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(0, 153, 204, 0.95)";
-      ctx.lineWidth = 1.8;
-      ctx.arc(mx, my, 6.5, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(0,153,204,0.9)";
+      ctx.lineWidth = 1.5;
+      ctx.arc(mx, my, 5.5, 0, Math.PI * 2);
       ctx.stroke();
 
       raf = requestAnimationFrame(draw);
