@@ -1,11 +1,26 @@
 # 86
 
-## V1 — GVG OS Global Platform
+GVG OS — Global Vista Group cinematic platform.
 
-Cyberpunk cinematic entry + full architecture pages (Phase 1–6 + Admin OS).
+## Versions
+
+| Version | Path | Notes |
+|--------|------|--------|
+| **V2** (current) | [`V2/`](./V2) | Saved current design — cosmos entry, light cyberpunk, marketplace |
+| V1 | [`V1/`](./V1) | Previous release snapshot |
 
 - Live: https://jin358-cmd.github.io/86/
-- Code: [`V1/`](./V1)
+- Active deploy source: `V2/`
+
+## Run V2
+
+```bash
+cd V2
+npm install
+npm run dev
+```
+
+## Run V1
 
 ```bash
 cd V1

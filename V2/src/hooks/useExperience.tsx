@@ -1,0 +1,193 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  canSkip,
+  nextScene,
+  SCENE_META,
+  SCENES,
+  type SceneId,
+} from "@/lib/experience";
+import {
+  playTone,
+  startAmbience,
+  unlockAudio,
+  setMuted,
+  isMuted,
+  startSfxLoop,
+  stopSfxLoop,
+} from "@/lib/audio";
+import type { MissionId } from "@/data/content";
+
+type ExperienceContextValue = {
+  scene: SceneId;
+  sceneIndex: number;
+  transitioning: boolean;
+  transitFrom: SceneId | null;
+  transitTo: SceneId | null;
+  selectedMission: MissionId;
+  muted: boolean;
+  goTo: (scene: SceneId) => void;
+  advance: () => void;
+  skip: () => void;
+  selectMission: (id: MissionId) => void;
+  toggleMute: () => void;
+  begin: () => Promise<void>;
+  started: boolean;
+};
+
+const ExperienceContext = createContext<ExperienceContextValue | null>(null);
+
+const TRANSIT_MS = 1100;
+
+export function ExperienceProvider({ children }: { children: ReactNode }) {
+  const [scene, setScene] = useState<SceneId>("boot");
+  const [started, setStarted] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const [transitFrom, setTransitFrom] = useState<SceneId | null>(null);
+  const [transitTo, setTransitTo] = useState<SceneId | null>(null);
+  const [selectedMission, setSelectedMission] = useState<MissionId>("landing");
+  const [muted, setMutedState] = useState(false);
+
+  const sceneIndex = SCENES.indexOf(scene);
+
+  const goTo = useCallback(
+    (next: SceneId) => {
+      setTransitFrom(scene);
+      setTransitTo(next);
+      setTransitioning(true);
+      playTone("whoosh");
+      window.setTimeout(() => {
+        setScene(next);
+        setTransitioning(false);
+        window.setTimeout(() => {
+          setTransitFrom(null);
+          setTransitTo(null);
+        }, 180);
+      }, TRANSIT_MS);
+    },
+    [scene],
+  );
+
+  const advance = useCallback(() => {
+    const n = nextScene(scene);
+    if (n) goTo(n);
+  }, [goTo, scene]);
+
+  const skip = useCallback(() => {
+    if (!canSkip(scene)) return;
+    playTone("ui");
+    if (scene === "boot" || scene === "wear") {
+      goTo("login");
+      return;
+    }
+    if (scene === "login" || scene === "city") {
+      goTo("world");
+      return;
+    }
+    if (scene === "world") {
+      goTo("dashboard");
+      return;
+    }
+    advance();
+  }, [advance, goTo, scene]);
+
+  const selectMission = useCallback((id: MissionId) => {
+    setSelectedMission(id);
+    playTone("confirm");
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    setMutedState((m) => {
+      const next = !m;
+      setMuted(next);
+      if (!next) {
+        startAmbience();
+        startSfxLoop();
+      } else {
+        stopSfxLoop();
+      }
+      return next;
+    });
+  }, []);
+
+  const begin = useCallback(async () => {
+    await unlockAudio();
+    startAmbience();
+    startSfxLoop();
+    setStarted(true);
+    playTone("boot");
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    const auto = SCENE_META[scene].autoAdvanceMs;
+    if (!auto) return;
+    const t = window.setTimeout(() => advance(), auto);
+    return () => window.clearTimeout(t);
+  }, [advance, scene, started]);
+
+  useEffect(() => {
+    setMuted(muted);
+    if (!muted && isMuted()) {
+      /* sync */
+    }
+  }, [muted]);
+
+  const value = useMemo(
+    () => ({
+      scene,
+      sceneIndex,
+      transitioning,
+      transitFrom,
+      transitTo,
+      selectedMission,
+      muted,
+      goTo,
+      advance,
+      skip,
+      selectMission,
+      toggleMute,
+      begin,
+      started,
+    }),
+    [
+      scene,
+      sceneIndex,
+      transitioning,
+      transitFrom,
+      transitTo,
+      selectedMission,
+      muted,
+      goTo,
+      advance,
+      skip,
+      selectMission,
+      toggleMute,
+      begin,
+      started,
+    ],
+  );
+
+  return (
+    <ExperienceContext.Provider value={value}>
+      {children}
+    </ExperienceContext.Provider>
+  );
+}
+
+export function useExperience() {
+  const ctx = useContext(ExperienceContext);
+  if (!ctx) {
+    throw new Error("useExperience must be used within ExperienceProvider");
+  }
+  return ctx;
+}

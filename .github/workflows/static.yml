@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: V1
+        working-directory: V2
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: V1/package-lock.json
+          cache-dependency-path: V2/package-lock.json
 
       - name: Install
         run: npm ci
@@ -48,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: V1/out
+          path: V2/out
 
       - name: Deploy to GitHub Pages
         id: deployment

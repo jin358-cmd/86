@@ -1,17 +1,8 @@
 # V1 — GVG OS Global Platform
 
-Cyberpunk cinematic entry (no virtual glasses) + full platform architecture pages.
+Previous release snapshot (kept for reference).
 
-## Flow
-
-`INITIALIZE` → Boot → Hero Cinematic → Platform Hub → Phase modules
-
-## Features
-
-- Scanlines / glitch / HUD atmosphere
-- Tech ambient BGM
-- Mouse-following HUD cursor trail
-- Phase 1–6 pages + Admin OS
+Current active version: [`../V2`](../V2)
 
 ## Run
 
