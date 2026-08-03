@@ -3,10 +3,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BOOT_LINES } from "@/data/content";
+import { useExperience } from "@/hooks/useExperience";
 import { playTone } from "@/lib/audio";
 
 export function BootScene() {
+  const { advance } = useExperience();
   const [visible, setVisible] = useState(0);
+  const done = visible >= BOOT_LINES.length;
 
   useEffect(() => {
     const timers: number[] = [];
@@ -20,6 +23,15 @@ export function BootScene() {
     });
     return () => timers.forEach((t) => window.clearTimeout(t));
   }, []);
+
+  // Bootloader complete → next program is WEAR / LINK
+  useEffect(() => {
+    if (!done) return;
+    const t = window.setTimeout(() => {
+      advance();
+    }, 1100);
+    return () => window.clearTimeout(t);
+  }, [advance, done]);
 
   return (
     <section className="relative grid min-h-[100dvh] place-items-center px-6">
@@ -42,6 +54,23 @@ export function BootScene() {
             ))}
           </AnimatePresence>
         </ul>
+
+        <AnimatePresence>
+          {done ? (
+            <motion.p
+              key="next-wear"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-5 font-display text-sm tracking-[0.28em] text-gvg-yellow"
+            >
+              NEXT PROGRAM · WEAR
+              <span className="mt-1 block font-mono text-[10px] tracking-[0.22em] text-gvg-cyan">
+                NEURAL LINK
+              </span>
+            </motion.p>
+          ) : null}
+        </AnimatePresence>
+
         <div className="mt-8">
           <div className="mb-2 flex items-baseline justify-between font-mono text-[11px] tracking-[0.22em] text-gvg-yellow md:text-xs">
             <span>BOOT PROGRESS</span>
