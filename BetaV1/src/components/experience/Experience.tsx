@@ -96,10 +96,10 @@ function SceneStage() {
               className="relative z-10"
             >
               {scene === "boot" && <BootScene />}
-              {scene === "neuralGlass" && <NeuralGlassSceneSection />}
               {scene === "wear" && (
                 <WearScene onJackInEffects={onJackInEffects} />
               )}
+              {scene === "neuralGlass" && <NeuralGlassSceneSection />}
               {scene === "login" && <LoginScene />}
               {scene === "city" && <CityRevealScene />}
               {scene === "world" && <WorldIntroScene />}
