@@ -2,16 +2,18 @@ import type { NextConfig } from "next";
 
 const repoName = "86";
 const isPages = process.env.GITHUB_PAGES === "true";
+const basePath = isPages ? `/${repoName}` : "";
 
 const nextConfig: NextConfig = {
-  // Always export static files so previews/Pages can host without a Node server.
   output: "export",
-  basePath: isPages ? `/${repoName}` : undefined,
-  assetPrefix: isPages ? `/${repoName}/` : undefined,
+  basePath: basePath || undefined,
+  assetPrefix: basePath ? `${basePath}/` : undefined,
   images: {
     unoptimized: true,
   },
-  transpilePackages: ["three"],
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
 };
 
 export default nextConfig;

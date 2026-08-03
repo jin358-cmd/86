@@ -1,10 +1,13 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import {
   JetBrains_Mono,
   Orbitron,
   Rajdhani,
   Space_Grotesk,
 } from "next/font/google";
+import { AtmosphereLayer } from "@/components/platform/AtmosphereLayer";
+import { SiteFooter } from "@/components/platform/SiteFooter";
+import { SiteHeader } from "@/components/platform/SiteHeader";
 import "./globals.css";
 
 const orbitron = Orbitron({
@@ -32,16 +35,9 @@ const space = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "GVG OS v3.0 — Neural Link Experience",
+  title: "GVG International Trade Platform · V1",
   description:
-    "Put on a Neural Link headset and enter GVG City — a cinematic interactive operating system experience.",
-  applicationName: "GVG OS",
-};
-
-export const viewport: Viewport = {
-  themeColor: "#080808",
-  width: "device-width",
-  initialScale: 1,
+    "Cyberpunk-styled GVG international trade platform for markets, routes, contracts, partners, intel, and investment.",
 };
 
 export default function RootLayout({
@@ -50,11 +46,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-Hant">
       <body
-        className={`${orbitron.variable} ${rajdhani.variable} ${jetbrains.variable} ${space.variable} antialiased`}
+        className={`${orbitron.variable} ${rajdhani.variable} ${jetbrains.variable} ${space.variable} min-h-screen bg-gvg-bg text-gvg-text antialiased`}
       >
-        {children}
+        <AtmosphereLayer />
+        <SiteHeader />
+        <main className="relative z-10">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );
