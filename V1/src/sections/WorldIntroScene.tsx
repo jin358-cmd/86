@@ -134,7 +134,7 @@ export function WorldIntroScene() {
             }}
             className="rounded-full border border-gvg-yellow bg-gvg-yellow/10 px-8 py-3 font-display text-sm tracking-[0.28em] text-gvg-yellow transition hover:bg-gvg-yellow hover:text-black"
           >
-            CONTINUE TO DASHBOARD
+            CONTINUE TO MISSIONS
           </button>
         </div>
       </div>

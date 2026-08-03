@@ -1,17 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* Light cyberpunk palette */
-  --gvg-yellow: #e8c200;
-  --gvg-bg: #eef3f8;
-  --gvg-panel: #ffffff;
-  --gvg-cyan: #0099cc;
-  --gvg-magenta: #d4147a;
-  --gvg-purple: #7b5cff;
-  --gvg-danger: #e11d48;
-  --gvg-text: #1a2332;
-  --gvg-ink: #0d1520;
-  --gvg-muted: #5b6b7c;
+  --gvg-yellow: #fcee0a;
+  --gvg-bg: #080808;
+  --gvg-panel: #111111;
+  --gvg-cyan: #00e5ff;
+  --gvg-danger: #ff1744;
+  --gvg-text: #ececec;
+  --gvg-muted: #8b8b8b;
 }
 
 @theme inline {
@@ -19,11 +15,8 @@
   --color-gvg-bg: var(--gvg-bg);
   --color-gvg-panel: var(--gvg-panel);
   --color-gvg-cyan: var(--gvg-cyan);
-  --color-gvg-magenta: var(--gvg-magenta);
-  --color-gvg-purple: var(--gvg-purple);
   --color-gvg-danger: var(--gvg-danger);
   --color-gvg-text: var(--gvg-text);
-  --color-gvg-ink: var(--gvg-ink);
   --color-gvg-muted: var(--gvg-muted);
   --font-display: var(--font-orbitron);
   --font-hud: var(--font-rajdhani);
@@ -46,16 +39,11 @@ body {
 body {
   font-family: var(--font-body), sans-serif;
   overflow-x: hidden;
-  background-image:
-    radial-gradient(ellipse at 12% 8%, rgba(0, 153, 204, 0.12), transparent 42%),
-    radial-gradient(ellipse at 88% 18%, rgba(212, 20, 122, 0.08), transparent 38%),
-    linear-gradient(180deg, #f7fbff 0%, #eef3f8 45%, #e6edf5 100%);
-  background-attachment: fixed;
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--gvg-cyan) 35%, transparent);
-  color: #fff;
+  background: color-mix(in oklab, var(--gvg-yellow) 35%, transparent);
+  color: #000;
 }
 
 .font-display {
@@ -75,16 +63,16 @@ body {
 }
 
 .glass-panel {
-  border: 1px solid rgba(13, 21, 32, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(
     160deg,
-    rgba(255, 255, 255, 0.92),
-    rgba(240, 246, 252, 0.78)
+    rgba(17, 17, 17, 0.78),
+    rgba(8, 8, 8, 0.55)
   );
-  backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.2);
   box-shadow:
-    0 0 0 1px rgba(0, 153, 204, 0.06) inset,
-    0 12px 36px rgba(13, 21, 32, 0.08);
+    0 0 0 1px rgba(252, 238, 10, 0.04) inset,
+    0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .interactive-card {
@@ -95,9 +83,9 @@ body {
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent 3px,
-    rgba(0, 153, 204, 0.035) 3px,
-    rgba(0, 153, 204, 0.035) 4px
+    transparent 2px,
+    rgba(0, 0, 0, 0.2) 2px,
+    rgba(0, 0, 0, 0.2) 4px
   );
   mix-blend-mode: multiply;
   animation: scan-drift 8s linear infinite;
@@ -115,7 +103,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  border: 1px solid rgba(0, 153, 204, 0.28);
+  border: 1px solid rgba(252, 238, 10, 0.28);
 }
 
 .hud-rings .ring-a {
@@ -126,14 +114,14 @@ body {
 
 .hud-rings .ring-b {
   inset: 16%;
-  border-color: rgba(212, 20, 122, 0.28);
+  border-color: rgba(0, 229, 255, 0.35);
   animation: spin-rev 12s linear infinite;
 }
 
 .hud-rings .ring-c {
   inset: 28%;
   border-width: 2px;
-  border-color: rgba(0, 153, 204, 0.55);
+  border-color: rgba(252, 238, 10, 0.65);
   border-top-color: transparent;
   border-left-color: transparent;
   animation: spin 7s linear infinite;
@@ -204,123 +192,17 @@ body {
     filter: none;
   }
   30% {
-    filter: hue-rotate(12deg) contrast(1.08) saturate(1.15);
+    filter: hue-rotate(12deg) contrast(1.15) saturate(1.3);
     transform: scale(1.01) skewX(0.4deg);
   }
   60% {
-    filter: hue-rotate(-8deg) contrast(1.1);
+    filter: hue-rotate(-8deg) contrast(1.2);
     transform: scale(1.015) skewX(-0.4deg);
   }
 }
 
 .animate-lens-distort {
   animation: lens-distort 0.7s ease;
-}
-
-@media (pointer: fine) {
-  body.gvg-cursor-active,
-  body.gvg-cursor-active * {
-    cursor: none !important;
-  }
-}
-
-@keyframes orbit-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes star-twinkle {
-  0%,
-  100% {
-    opacity: 0.25;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.4);
-  }
-}
-
-/* Rectangular same-color radiate from INITIALIZE button bounds */
-.init-pulse-ring {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(0, 153, 204, 0.7);
-  border-radius: 2px;
-  animation: init-rect-radiate 1.8s ease-out infinite;
-}
-
-.init-pulse-ring.init-cyan {
-  border-color: rgba(0, 153, 204, 0.75);
-  box-shadow: 0 0 12px rgba(0, 153, 204, 0.25);
-}
-
-.init-pulse-ring.delay-1 {
-  animation-delay: 0.6s;
-}
-
-.init-pulse-ring.delay-2 {
-  animation-delay: 1.2s;
-}
-
-@keyframes init-rect-radiate {
-  0% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1.85, 2.4);
-    opacity: 0;
-  }
-}
-
-.fp-tunnel {
-  background:
-    radial-gradient(circle at center, transparent 8%, rgba(7, 11, 20, 0.2) 35%, #05080f 72%),
-    repeating-radial-gradient(
-      circle at center,
-      transparent 0,
-      transparent 18px,
-      rgba(0, 153, 204, 0.08) 19px,
-      transparent 22px
-    );
-  animation: tunnel-rush 1.1s ease-in;
-}
-
-@keyframes tunnel-rush {
-  from {
-    transform: scale(0.7);
-    opacity: 0.4;
-  }
-  to {
-    transform: scale(1.15);
-    opacity: 1;
-  }
-}
-
-.fp-starline {
-  transform-origin: left center;
-  animation: starline-rush 0.85s linear infinite;
-  opacity: 0.55;
-}
-
-@keyframes starline-rush {
-  0% {
-    transform: rotate(var(--r, 0deg)) scaleX(0.15);
-    opacity: 0;
-  }
-  35% {
-    opacity: 0.85;
-  }
-  100% {
-    transform: rotate(var(--r, 0deg)) scaleX(1.55);
-    opacity: 0;
-  }
 }
 
 @keyframes dust-float {

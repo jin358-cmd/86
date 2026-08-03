@@ -1,10 +1,17 @@
 export const BOOT_LINES = [
   "SYSTEM INITIALIZING",
-  "Loading Global Network...",
-  "AI Core Online...",
-  "Trade Grid Sync...",
-  "Platform Modules Ready...",
-  "Welcome to GVG OS...",
+  "Checking Memory...",
+  "GPU Online...",
+  "Quantum Network...",
+  "Neural Interface...",
+  "Ready...",
+] as const;
+
+export const GLASS_SCAN_LINES = [
+  "Scanning User...",
+  "Eye Tracking...",
+  "Identity Verification...",
+  "Brainwave Stable...",
 ] as const;
 
 export const WEAR_PROGRESS = [0, 18, 35, 61, 82, 100] as const;
@@ -102,51 +109,43 @@ export const WORLD_ROUTES: Array<[string, string]> = [
   ["jp", "us"],
 ];
 
-export const CORE_MODULES = [
+export const MISSIONS = [
   {
-    id: "landing",
-    code: "01",
-    title: "Landing",
-    zh: "沉浸式首頁",
-    detail: "進入 GVG OS 的沉浸式入口層，總覽平台狀態與核心捷徑。",
-  },
-  {
-    id: "products",
-    code: "02",
-    title: "Product Center",
-    zh: "商品中心",
-    detail: "廠家、代理、經銷商上架與分類瀏覽。",
-  },
-  {
-    id: "marketplace",
-    code: "03",
-    title: "Marketplace",
-    zh: "全球商城",
-    detail: "B2B/B2C 交易、精選供應商與熱門商品。",
+    id: "enter",
+    title: "ENTER",
+    subtitle: "Access the civic layer",
+    detail: "Cross the perimeter and initialize your citizen profile.",
   },
   {
     id: "trade",
-    code: "04",
-    title: "Trade",
-    zh: "國際貿易",
-    detail: "採購、物流、關稅與跨境媒合。",
+    title: "TRADE",
+    subtitle: "Open quantum markets",
+    detail: "Route assets through encrypted settlement corridors.",
   },
   {
-    id: "ai-services",
-    code: "05",
-    title: "AI Services",
-    zh: "AI 智慧服務",
-    detail: "商業顧問、採購助理、價格預測與翻譯。",
+    id: "build",
+    title: "BUILD",
+    subtitle: "Shape the skyline",
+    detail: "Claim construction rights and grow vertical districts.",
   },
   {
-    id: "partners",
-    code: "06",
-    title: "Partners",
-    zh: "合作夥伴",
-    detail: "企業、代理商與投資人專區。",
+    id: "invest",
+    title: "INVEST",
+    subtitle: "Fund the grid",
+    detail: "Allocate capital into energy, AI, and transit networks.",
+  },
+  {
+    id: "create",
+    title: "CREATE",
+    subtitle: "Design the future",
+    detail: "Prototype products inside the digital twin sandbox.",
+  },
+  {
+    id: "connect",
+    title: "CONNECT",
+    subtitle: "Link global nodes",
+    detail: "Establish alliances across Taiwan, USA, Japan, and beyond.",
   },
 ] as const;
 
-export type ModuleId = (typeof CORE_MODULES)[number]["id"];
-export type MissionId = ModuleId;
-export const MISSIONS = CORE_MODULES;
+export type MissionId = (typeof MISSIONS)[number]["id"];

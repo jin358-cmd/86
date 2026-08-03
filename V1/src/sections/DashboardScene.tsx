@@ -1,9 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { CORE_MODULES, DISTRICTS } from "@/data/content";
+import { MISSIONS, DISTRICTS } from "@/data/content";
 import { useExperience } from "@/hooks/useExperience";
 import { Bot, Crosshair, Radio } from "lucide-react";
 
@@ -12,20 +11,10 @@ const GvgCityCanvas = dynamic(
   { ssr: false, loading: () => <div className="h-full w-full bg-gvg-bg" /> },
 );
 
-const MODULE_HREF: Record<string, string> = {
-  products: "/products",
-  marketplace: "/marketplace",
-  trade: "/trade",
-  "ai-services": "/ai-resource",
-  partners: "/company",
-  landing: "/",
-};
-
 export function DashboardScene() {
-  const { selectedMission, selectMission } = useExperience();
-  const mod =
-    CORE_MODULES.find((m) => m.id === selectedMission) ?? CORE_MODULES[0];
-  const href = MODULE_HREF[mod.id];
+  const { selectedMission, goTo } = useExperience();
+  const mission =
+    MISSIONS.find((m) => m.id === selectedMission) ?? MISSIONS[0];
 
   return (
     <section className="relative min-h-[100dvh] overflow-hidden">
@@ -42,35 +31,26 @@ export function DashboardScene() {
         >
           <div className="mb-3 flex items-center gap-2 text-gvg-yellow">
             <Crosshair size={16} />
-            <p className="font-hud text-xs tracking-[0.25em]">ACTIVE MODULE</p>
+            <p className="font-hud text-xs tracking-[0.25em]">MISSION</p>
           </div>
-          <p className="font-mono text-[10px] tracking-[0.28em] text-gvg-cyan">
-            MODULE {mod.code}
-          </p>
-          <h3 className="mt-2 font-display text-xl tracking-[0.18em] text-gvg-text">
-            {mod.title}
+          <h3 className="font-display text-xl tracking-[0.18em] text-gvg-text">
+            {mission.title}
           </h3>
-          <p className="mt-1 font-hud text-sm tracking-[0.1em] text-gvg-yellow">
-            {mod.zh}
+          <p className="mt-2 font-body text-sm text-gvg-muted">
+            {mission.detail}
           </p>
-          <p className="mt-3 font-body text-sm text-gvg-muted">{mod.detail}</p>
           <ul className="mt-5 space-y-2 font-mono text-[10px] tracking-wider text-gvg-muted">
-            <li className="text-gvg-cyan">STATUS · ONLINE</li>
-            <li>LAYER · CORE OS</li>
+            <li className="text-gvg-cyan">STATUS · ACTIVE</li>
+            <li>PRIORITY · HIGH</li>
             <li>SECTOR · {DISTRICTS[0].name}</li>
           </ul>
-          {href && href !== "/" ? (
-            <Link
-              href={href}
-              className="mt-6 block w-full rounded border border-gvg-yellow/50 px-3 py-2 text-center font-hud text-[10px] tracking-[0.25em] text-gvg-yellow transition hover:bg-gvg-yellow hover:text-black"
-            >
-              OPEN MODULE
-            </Link>
-          ) : (
-            <p className="mt-6 font-mono text-[10px] tracking-wider text-gvg-purple">
-              HOME NODE · ACTIVE
-            </p>
-          )}
+          <button
+            type="button"
+            onClick={() => goTo("missions")}
+            className="mt-6 w-full rounded border border-gvg-yellow/50 px-3 py-2 font-hud text-[10px] tracking-[0.25em] text-gvg-yellow transition hover:bg-gvg-yellow hover:text-black"
+          >
+            CHANGE MISSION
+          </button>
         </motion.aside>
 
         <motion.div
@@ -82,11 +62,11 @@ export function DashboardScene() {
             LIVE TWIN · GVG CITY
           </p>
           <h2 className="mt-3 font-display text-3xl tracking-[0.16em] text-gvg-yellow md:text-5xl">
-            {mod.title.toUpperCase()}
+            COMMAND DECK
           </h2>
           <p className="mt-3 max-w-md font-body text-sm text-gvg-muted">
-            模組已載入。流程 Boot → Wear → Login → City → World → Dashboard
-            完成。「{mod.zh}」可由此進入平台作業。
+            Flying lanes, particle weather, and billboard pulses sync to the
+            digital twin. You are inside the GVG operating system.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             {["CLEAR", "FOG", "NEON STORM", "ORBITAL"].map((w) => (
@@ -103,7 +83,7 @@ export function DashboardScene() {
         <motion.aside
           initial={{ x: 24, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="glass-panel h-fit max-h-[70vh] overflow-y-auto p-4 md:justify-self-end"
+          className="glass-panel h-fit p-4 md:justify-self-end"
         >
           <div className="mb-3 flex items-center gap-2 text-gvg-cyan">
             <Bot size={16} />
@@ -111,28 +91,12 @@ export function DashboardScene() {
           </div>
           <div className="space-y-3 font-body text-sm text-gvg-muted">
             <p className="rounded border border-white/10 bg-black/30 p-3 text-gvg-text">
-              Module {mod.code}「{mod.title}」已就緒。切換核心模組或開啟商品中心。
+              Neural link stable. Recommend scanning AI District before Trade
+              Center routing.
             </p>
             <p className="rounded border border-white/10 bg-black/30 p-3">
-              建議下一步：Product Center 上架、Marketplace 媒合、AI 智慧服務。
+              Drone corridor density is elevated near Space Port. Reroute?
             </p>
-          </div>
-          <div className="mt-4 space-y-1">
-            {CORE_MODULES.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => selectMission(m.id)}
-                className={`flex w-full items-center justify-between px-2 py-1 text-left font-mono text-[10px] tracking-wider transition ${
-                  m.id === mod.id
-                    ? "text-gvg-yellow"
-                    : "text-gvg-muted hover:text-gvg-yellow"
-                }`}
-              >
-                <span>{m.code}</span>
-                <span>{m.title}</span>
-              </button>
-            ))}
           </div>
           <div className="mt-4 flex items-center gap-2 font-mono text-[10px] tracking-wider text-gvg-yellow">
             <Radio size={14} />

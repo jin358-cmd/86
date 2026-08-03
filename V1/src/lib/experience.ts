@@ -1,9 +1,11 @@
 export const SCENES = [
   "boot",
+  "neuralGlass",
   "wear",
   "login",
   "city",
   "world",
+  "missions",
   "dashboard",
 ] as const;
 
@@ -14,11 +16,13 @@ export const SCENE_META: Record<
   { label: string; autoAdvanceMs?: number }
 > = {
   boot: { label: "BOOT", autoAdvanceMs: 5200 },
-  wear: { label: "WEAR", autoAdvanceMs: undefined },
+  neuralGlass: { label: "OPTICS", autoAdvanceMs: 7000 },
+  wear: { label: "LINK", autoAdvanceMs: undefined },
   login: { label: "LOGIN", autoAdvanceMs: 4500 },
   city: { label: "CITY", autoAdvanceMs: 8000 },
   world: { label: "WORLD", autoAdvanceMs: undefined },
-  dashboard: { label: "DASHBOARD", autoAdvanceMs: undefined },
+  missions: { label: "MISSION", autoAdvanceMs: undefined },
+  dashboard: { label: "OS", autoAdvanceMs: undefined },
 };
 
 export function nextScene(current: SceneId): SceneId | null {

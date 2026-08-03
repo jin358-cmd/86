@@ -6,8 +6,8 @@ GVG OS — Global Vista Group cinematic platform.
 
 | Version | Path | Notes |
 |--------|------|--------|
-| **V1** (current) | [`V1/`](./V1) | Active release — live GitHub Pages deploy |
-| V2 | [`V2/`](./V2) | Saved design snapshot |
+| **V1** (current) | [`V1/`](./V1) | Original Neural Link cinematic experience — live deploy |
+| V2 | [`V2/`](./V2) | Later marketplace / light-cyberpunk design snapshot |
 
 - Live: https://jin358-cmd.github.io/86/
 - Active deploy source: `V1/`

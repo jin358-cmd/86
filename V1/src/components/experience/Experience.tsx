@@ -1,52 +1,77 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Atmosphere } from "@/components/effects/Atmosphere";
-import { CursorTrail } from "@/components/effects/CursorTrail";
 import { FloatingDust } from "@/components/effects/FloatingDust";
 import { ChromeHud } from "@/components/hud/ChromeHud";
-import {
-  FirstPersonTransit,
-  StartGate,
-} from "@/components/experience/StartGate";
 import {
   ExperienceProvider,
   useExperience,
 } from "@/hooks/useExperience";
 import { useLenis } from "@/hooks/useLenis";
 import { BootScene } from "@/sections/BootScene";
+import { NeuralGlassSceneSection } from "@/sections/NeuralGlassSceneSection";
 import { WearScene } from "@/sections/WearScene";
 import { LoginScene } from "@/sections/LoginScene";
 import { CityRevealScene } from "@/sections/CityRevealScene";
 import { WorldIntroScene } from "@/sections/WorldIntroScene";
+import { MissionSelectScene } from "@/sections/MissionSelectScene";
 import { DashboardScene } from "@/sections/DashboardScene";
-import type { SceneId } from "@/lib/experience";
+
+function StartGate() {
+  const { begin, started } = useExperience();
+  if (started) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-gvg-bg px-6">
+      <div className="max-w-lg text-center">
+        <p className="font-mono text-xs tracking-[0.4em] text-gvg-cyan">
+          GVG OS v3.0
+        </p>
+        <h1 className="mt-4 font-display text-4xl tracking-[0.14em] text-gvg-yellow md:text-6xl">
+          NEURAL LINK
+        </h1>
+        <p className="mt-4 font-body text-gvg-muted">
+          Put on the headset. Enter the GVG Digital Universe — a cinematic OS
+          experience inspired by high-end sci-fi interfaces.
+        </p>
+        <button
+          type="button"
+          onClick={() => void begin()}
+          className="mt-8 rounded-full border border-gvg-yellow bg-gvg-yellow px-8 py-3 font-display text-sm tracking-[0.28em] text-black transition hover:bg-transparent hover:text-gvg-yellow"
+        >
+          INITIALIZE
+        </button>
+        <p className="mt-4 font-mono text-[10px] tracking-wider text-gvg-muted">
+          AUDIO + VISUAL SYSTEMS WILL ENGAGE
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function SceneStage() {
-  const { scene, transitioning, started, transitFrom, transitTo } =
-    useExperience();
-  const [jackIn, setJackIn] = useState(false);
-  useLenis(started && scene === "dashboard");
+  const { scene, transitioning, started } = useExperience();
+  const [fx, setFx] = useState({ flash: false, shake: false, distort: false });
+  useLenis(
+    started && (scene === "world" || scene === "missions" || scene === "dashboard"),
+  );
+
+  const onJackInEffects = useCallback((active: boolean) => {
+    setFx({ flash: active, shake: active, distort: active });
+  }, []);
 
   return (
     <>
-      <Atmosphere />
-      <CursorTrail />
+      <Atmosphere {...fx} />
       <ChromeHud />
       <StartGate />
-      <FirstPersonTransit
-        from={transitFrom}
-        to={transitTo}
-        active={started && transitioning}
-      />
 
       {started && (
         <div
           className={
-            transitioning || jackIn
-              ? "pointer-events-none opacity-30 blur-sm"
-              : ""
+            transitioning ? "pointer-events-none opacity-40 blur-sm" : ""
           }
         >
           {(scene === "boot" || scene === "wear" || scene === "login") && (
@@ -55,37 +80,26 @@ function SceneStage() {
           <AnimatePresence mode="wait">
             <motion.div
               key={scene}
-              initial={{ opacity: 0, scale: 1.04 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.55 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
             >
               {scene === "boot" && <BootScene />}
-              {scene === "wear" && <WearScene onJackInEffects={setJackIn} />}
+              {scene === "neuralGlass" && <NeuralGlassSceneSection />}
+              {scene === "wear" && (
+                <WearScene onJackInEffects={onJackInEffects} />
+              )}
               {scene === "login" && <LoginScene />}
               {scene === "city" && <CityRevealScene />}
               {scene === "world" && <WorldIntroScene />}
+              {scene === "missions" && <MissionSelectScene />}
               {scene === "dashboard" && <DashboardScene />}
             </motion.div>
           </AnimatePresence>
-
-          <ChapterNodeBadge scene={scene} />
         </div>
       )}
     </>
-  );
-}
-
-function ChapterNodeBadge({ scene }: { scene: SceneId }) {
-  return (
-    <div className="pointer-events-none fixed bottom-6 left-1/2 z-[90] -translate-x-1/2">
-      <div className="glass-panel flex items-center gap-3 px-4 py-2">
-        <span className="size-2 animate-pulse rounded-full bg-gvg-magenta shadow-[0_0_10px_rgba(212,20,122,0.8)]" />
-        <p className="font-mono text-[10px] tracking-[0.28em] text-gvg-ink">
-          CHAPTER NODE · {scene.toUpperCase()} · START / END
-        </p>
-      </div>
-    </div>
   );
 }
 
