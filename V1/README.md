@@ -17,11 +17,18 @@ Next.js 15 · React 19 · TypeScript · Tailwind CSS · Three.js / R3F · Framer
 ## Local development
 
 ```bash
+cd V1
 npm install
 npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+## Live preview
+
+https://jin358-cmd.github.io/86/v1/
+
+Version hub: https://jin358-cmd.github.io/86/
 
 ## Production build
 

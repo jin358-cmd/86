@@ -1,14 +1,13 @@
 import type { NextConfig } from "next";
 
-const repoName = "86";
-const isPages = process.env.GITHUB_PAGES === "true";
+/** Set by CI, e.g. `/86/v1` or `/86/v2`. Empty for local `npm run dev`. */
+const pagesBase = process.env.PAGES_BASE_PATH?.replace(/\/$/, "") || "";
 
 const nextConfig: NextConfig = {
-  // Always export static files so previews/Pages can host without a Node server.
   output: "export",
   trailingSlash: true,
-  basePath: isPages ? `/${repoName}` : undefined,
-  assetPrefix: isPages ? `/${repoName}/` : undefined,
+  basePath: pagesBase || undefined,
+  assetPrefix: pagesBase ? `${pagesBase}/` : undefined,
   images: {
     unoptimized: true,
   },

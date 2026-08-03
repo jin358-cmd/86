@@ -20,9 +20,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: V1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,15 +29,38 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: V1/package-lock.json
+          cache-dependency-path: |
+            V1/package-lock.json
+            V2/package-lock.json
 
-      - name: Install
+      - name: Install V1
+        working-directory: V1
         run: npm ci
 
-      - name: Build static export
+      - name: Build V1 (/86/v1)
+        working-directory: V1
         run: npm run build
         env:
-          GITHUB_PAGES: "true"
+          PAGES_BASE_PATH: /86/v1
+
+      - name: Install V2
+        working-directory: V2
+        run: npm ci
+
+      - name: Build V2 (/86/v2)
+        working-directory: V2
+        run: npm run build
+        env:
+          PAGES_BASE_PATH: /86/v2
+
+      - name: Assemble multi-version site
+        run: |
+          rm -rf site
+          mkdir -p site/v1 site/v2
+          cp site-hub/index.html site/index.html
+          cp -R V1/out/. site/v1/
+          cp -R V2/out/. site/v2/
+          ls -la site site/v1 site/v2 | head -40
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -48,7 +68,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: V1/out
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment

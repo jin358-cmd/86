@@ -11,3 +11,11 @@ cd V2
 npm install
 npm run dev
 ```
+
+Open `http://localhost:3000`.
+
+## Live preview
+
+https://jin358-cmd.github.io/86/v2/
+
+Version hub: https://jin358-cmd.github.io/86/
