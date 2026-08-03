@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useState } from "react";
 import { Atmosphere } from "@/components/effects/Atmosphere";
+import { CursorTrail } from "@/components/effects/CursorTrail";
 import { FloatingDust } from "@/components/effects/FloatingDust";
 import { ChromeHud } from "@/components/hud/ChromeHud";
 import {
@@ -11,13 +11,8 @@ import {
 } from "@/hooks/useExperience";
 import { useLenis } from "@/hooks/useLenis";
 import { BootScene } from "@/sections/BootScene";
-import { NeuralGlassSceneSection } from "@/sections/NeuralGlassSceneSection";
-import { WearScene } from "@/sections/WearScene";
-import { LoginScene } from "@/sections/LoginScene";
-import { CityRevealScene } from "@/sections/CityRevealScene";
-import { WorldIntroScene } from "@/sections/WorldIntroScene";
-import { MissionSelectScene } from "@/sections/MissionSelectScene";
-import { DashboardScene } from "@/sections/DashboardScene";
+import { HeroScene } from "@/sections/HeroScene";
+import { HubScene } from "@/sections/HubScene";
 
 function StartGate() {
   const { begin, started } = useExperience();
@@ -27,19 +22,19 @@ function StartGate() {
     <div className="fixed inset-0 z-[100] grid place-items-center bg-gvg-bg px-6">
       <div className="max-w-lg text-center">
         <p className="font-mono text-xs tracking-[0.4em] text-gvg-cyan">
-          GVG OS v3.0
+          GVG OS · GLOBAL PLATFORM
         </p>
         <h1 className="mt-4 font-display text-4xl tracking-[0.14em] text-gvg-yellow md:text-6xl">
-          NEURAL LINK
+          START EXPERIENCE
         </h1>
         <p className="mt-4 font-body text-gvg-muted">
-          Put on the headset. Enter the GVG Digital Universe — a cinematic OS
-          experience inspired by high-end sci-fi interfaces.
+          進入 Global Vista Group 電影級品牌入口。科技背景音樂與 HUD
+          特效將同步啟動。
         </p>
         <button
           type="button"
           onClick={() => void begin()}
-          className="mt-8 rounded-full border border-gvg-yellow bg-gvg-yellow px-8 py-3 font-display text-sm tracking-[0.28em] text-black transition hover:bg-transparent hover:text-gvg-yellow"
+          className="mt-8 border border-gvg-yellow bg-gvg-yellow px-8 py-3 font-display text-sm tracking-[0.28em] text-black transition hover:bg-transparent hover:text-gvg-yellow"
         >
           INITIALIZE
         </button>
@@ -53,18 +48,12 @@ function StartGate() {
 
 function SceneStage() {
   const { scene, transitioning, started } = useExperience();
-  const [fx, setFx] = useState({ flash: false, shake: false, distort: false });
-  useLenis(
-    started && (scene === "world" || scene === "missions" || scene === "dashboard"),
-  );
-
-  const onJackInEffects = useCallback((active: boolean) => {
-    setFx({ flash: active, shake: active, distort: active });
-  }, []);
+  useLenis(started && scene === "hub");
 
   return (
     <>
-      <Atmosphere {...fx} />
+      <Atmosphere />
+      <CursorTrail />
       <ChromeHud />
       <StartGate />
 
@@ -74,9 +63,7 @@ function SceneStage() {
             transitioning ? "pointer-events-none opacity-40 blur-sm" : ""
           }
         >
-          {(scene === "boot" || scene === "wear" || scene === "login") && (
-            <FloatingDust />
-          )}
+          {(scene === "boot" || scene === "hero") && <FloatingDust />}
           <AnimatePresence mode="wait">
             <motion.div
               key={scene}
@@ -86,15 +73,8 @@ function SceneStage() {
               transition={{ duration: 0.4 }}
             >
               {scene === "boot" && <BootScene />}
-              {scene === "neuralGlass" && <NeuralGlassSceneSection />}
-              {scene === "wear" && (
-                <WearScene onJackInEffects={onJackInEffects} />
-              )}
-              {scene === "login" && <LoginScene />}
-              {scene === "city" && <CityRevealScene />}
-              {scene === "world" && <WorldIntroScene />}
-              {scene === "missions" && <MissionSelectScene />}
-              {scene === "dashboard" && <DashboardScene />}
+              {scene === "hero" && <HeroScene />}
+              {scene === "hub" && <HubScene />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -23,18 +23,15 @@ import {
   setMuted,
   isMuted,
 } from "@/lib/audio";
-import type { MissionId } from "@/data/content";
 
 type ExperienceContextValue = {
   scene: SceneId;
   sceneIndex: number;
   transitioning: boolean;
-  selectedMission: MissionId | null;
   muted: boolean;
   goTo: (scene: SceneId) => void;
   advance: () => void;
   skip: () => void;
-  selectMission: (id: MissionId) => void;
   toggleMute: () => void;
   begin: () => Promise<void>;
   started: boolean;
@@ -46,11 +43,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [scene, setScene] = useState<SceneId>("boot");
   const [started, setStarted] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const [selectedMission, setSelectedMission] = useState<MissionId | null>(
-    null,
-  );
   const [muted, setMutedState] = useState(false);
-
   const sceneIndex = SCENES.indexOf(scene);
 
   const goTo = useCallback((next: SceneId) => {
@@ -70,26 +63,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const skip = useCallback(() => {
     if (!canSkip(scene)) return;
     playTone("ui");
-    // Skip cinematic prologue → world intro
-    if (scene === "boot" || scene === "neuralGlass" || scene === "wear") {
-      goTo("login");
-      return;
-    }
-    if (scene === "login" || scene === "city") {
-      goTo("world");
-      return;
-    }
-    advance();
-  }, [advance, goTo, scene]);
-
-  const selectMission = useCallback(
-    (id: MissionId) => {
-      setSelectedMission(id);
-      playTone("confirm");
-      goTo("dashboard");
-    },
-    [goTo],
-  );
+    goTo("hub");
+  }, [goTo, scene]);
 
   const toggleMute = useCallback(() => {
     setMutedState((m) => {
@@ -118,7 +93,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMuted(muted);
     if (!muted && isMuted()) {
-      /* sync helper */
+      /* sync */
     }
   }, [muted]);
 
@@ -127,12 +102,10 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       scene,
       sceneIndex,
       transitioning,
-      selectedMission,
       muted,
       goTo,
       advance,
       skip,
-      selectMission,
       toggleMute,
       begin,
       started,
@@ -141,12 +114,10 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       scene,
       sceneIndex,
       transitioning,
-      selectedMission,
       muted,
       goTo,
       advance,
       skip,
-      selectMission,
       toggleMute,
       begin,
       started,

@@ -205,6 +205,12 @@ body {
   animation: lens-distort 0.7s ease;
 }
 
+@media (pointer: fine) {
+  body.gvg-cursor-active {
+    cursor: none;
+  }
+}
+
 @keyframes dust-float {
   0% {
     transform: translateY(10px);

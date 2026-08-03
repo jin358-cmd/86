@@ -49,10 +49,10 @@ export function playTone(kind: ToneKind = "ui") {
     { type: OscillatorType; f: number; dur: number; vol: number }
   > = {
     boot: { type: "sawtooth", f: 180, dur: 0.18, vol: 0.03 },
-    ui: { type: "sine", f: 880, dur: 0.06, vol: 0.025 },
-    confirm: { type: "triangle", f: 520, dur: 0.14, vol: 0.035 },
+    ui: { type: "sine", f: 880, dur: 0.06, vol: 0.02 },
+    confirm: { type: "triangle", f: 520, dur: 0.14, vol: 0.03 },
     warn: { type: "square", f: 240, dur: 0.12, vol: 0.02 },
-    whoosh: { type: "sine", f: 120, dur: 0.35, vol: 0.04 },
+    whoosh: { type: "sine", f: 120, dur: 0.35, vol: 0.035 },
   };
 
   const p = presets[kind];
@@ -71,47 +71,83 @@ export function playTone(kind: ToneKind = "ui") {
   osc.stop(now + p.dur + 0.02);
 }
 
+/** Tech / cyber ambient bed: low drone + pulse + soft arpeggio */
 export function startAmbience() {
   if (muted || ambienceNodes) return;
   const c = ctx();
   if (!c) return;
 
   const master = c.createGain();
-  master.gain.value = 0.018;
+  master.gain.value = 0.028;
   master.connect(c.destination);
+
+  const filter = c.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 900;
+  filter.Q.value = 0.7;
+  filter.connect(master);
 
   const drone = c.createOscillator();
   drone.type = "sine";
-  drone.frequency.value = 55;
+  drone.frequency.value = 48;
   const droneGain = c.createGain();
-  droneGain.gain.value = 0.7;
+  droneGain.gain.value = 0.55;
   drone.connect(droneGain);
-  droneGain.connect(master);
+  droneGain.connect(filter);
 
-  const shimmer = c.createOscillator();
-  shimmer.type = "triangle";
-  shimmer.frequency.value = 220;
-  const shimmerGain = c.createGain();
-  shimmerGain.gain.value = 0.15;
+  const pulse = c.createOscillator();
+  pulse.type = "triangle";
+  pulse.frequency.value = 96;
+  const pulseGain = c.createGain();
+  pulseGain.gain.value = 0.12;
   const lfo = c.createOscillator();
-  lfo.frequency.value = 0.08;
+  lfo.frequency.value = 0.35;
   const lfoGain = c.createGain();
-  lfoGain.gain.value = 0.08;
+  lfoGain.gain.value = 0.1;
   lfo.connect(lfoGain);
-  lfoGain.connect(shimmerGain.gain);
+  lfoGain.connect(pulseGain.gain);
+  pulse.connect(pulseGain);
+  pulseGain.connect(filter);
+
+  const arp = c.createOscillator();
+  arp.type = "sine";
+  arp.frequency.value = 196;
+  const arpGain = c.createGain();
+  arpGain.gain.value = 0.04;
+  const arpLfo = c.createOscillator();
+  arpLfo.frequency.value = 2.5;
+  const arpLfoGain = c.createGain();
+  arpLfoGain.gain.value = 0.035;
+  arpLfo.connect(arpLfoGain);
+  arpLfoGain.connect(arpGain.gain);
+  arp.connect(arpGain);
+  arpGain.connect(master);
+
+  // Soft high shimmer
+  const shimmer = c.createOscillator();
+  shimmer.type = "sine";
+  shimmer.frequency.value = 392;
+  const shimmerGain = c.createGain();
+  shimmerGain.gain.value = 0.018;
   shimmer.connect(shimmerGain);
   shimmerGain.connect(master);
 
   drone.start();
-  shimmer.start();
+  pulse.start();
   lfo.start();
+  arp.start();
+  arpLfo.start();
+  shimmer.start();
 
   ambienceNodes = {
     stop: () => {
       try {
         drone.stop();
-        shimmer.stop();
+        pulse.stop();
         lfo.stop();
+        arp.stop();
+        arpLfo.stop();
+        shimmer.stop();
       } catch {
         /* already stopped */
       }

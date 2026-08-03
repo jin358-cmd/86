@@ -1,20 +1,11 @@
 export const BOOT_LINES = [
   "SYSTEM INITIALIZING",
-  "Checking Memory...",
-  "GPU Online...",
-  "Quantum Network...",
-  "Neural Interface...",
-  "Ready...",
+  "Loading Global Network...",
+  "AI Core Online...",
+  "Trade Grid Sync...",
+  "Platform Modules Ready...",
+  "Welcome to GVG OS...",
 ] as const;
-
-export const GLASS_SCAN_LINES = [
-  "Scanning User...",
-  "Eye Tracking...",
-  "Identity Verification...",
-  "Brainwave Stable...",
-] as const;
-
-export const WEAR_PROGRESS = [0, 18, 35, 61, 82, 100] as const;
 
 export const HIERARCHY = [
   {

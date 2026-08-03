@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import {
   JetBrains_Mono,
   Orbitron,
@@ -32,16 +32,9 @@ const space = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "GVG OS v3.0 — Neural Link Experience",
+  title: "GVG OS — Global Platform",
   description:
-    "Put on a Neural Link headset and enter GVG City — a cinematic interactive operating system experience.",
-  applicationName: "GVG OS",
-};
-
-export const viewport: Viewport = {
-  themeColor: "#080808",
-  width: "device-width",
-  initialScale: 1,
+    "Global Vista Group cyberpunk operating system for trade, AI, community, and admin.",
 };
 
 export default function RootLayout({
@@ -50,9 +43,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-Hant">
       <body
-        className={`${orbitron.variable} ${rajdhani.variable} ${jetbrains.variable} ${space.variable} antialiased`}
+        className={`${orbitron.variable} ${rajdhani.variable} ${jetbrains.variable} ${space.variable} min-h-screen bg-gvg-bg text-gvg-text antialiased`}
       >
         {children}
       </body>

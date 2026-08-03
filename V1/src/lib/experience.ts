@@ -1,13 +1,4 @@
-export const SCENES = [
-  "boot",
-  "neuralGlass",
-  "wear",
-  "login",
-  "city",
-  "world",
-  "missions",
-  "dashboard",
-] as const;
+export const SCENES = ["boot", "hero", "hub"] as const;
 
 export type SceneId = (typeof SCENES)[number];
 
@@ -15,14 +6,9 @@ export const SCENE_META: Record<
   SceneId,
   { label: string; autoAdvanceMs?: number }
 > = {
-  boot: { label: "BOOT", autoAdvanceMs: 5200 },
-  neuralGlass: { label: "OPTICS", autoAdvanceMs: 7000 },
-  wear: { label: "LINK", autoAdvanceMs: undefined },
-  login: { label: "LOGIN", autoAdvanceMs: 4500 },
-  city: { label: "CITY", autoAdvanceMs: 8000 },
-  world: { label: "WORLD", autoAdvanceMs: undefined },
-  missions: { label: "MODULES", autoAdvanceMs: undefined },
-  dashboard: { label: "OS", autoAdvanceMs: undefined },
+  boot: { label: "BOOT", autoAdvanceMs: 4800 },
+  hero: { label: "HERO", autoAdvanceMs: undefined },
+  hub: { label: "HUB", autoAdvanceMs: undefined },
 };
 
 export function nextScene(current: SceneId): SceneId | null {
@@ -32,5 +18,5 @@ export function nextScene(current: SceneId): SceneId | null {
 }
 
 export function canSkip(scene: SceneId): boolean {
-  return scene !== "dashboard";
+  return scene !== "hub";
 }
