@@ -1,7 +1,7 @@
 export const SCENES = [
   "boot",
-  "neuralGlass",
   "wear",
+  "neuralGlass",
   "login",
   "city",
   "world",
