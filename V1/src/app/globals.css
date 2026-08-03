@@ -233,6 +233,96 @@ body {
   }
 }
 
+/* 3D satellite orbital stage around start titles */
+.orbit-3d-stage {
+  perspective: 920px;
+  perspective-origin: 50% 45%;
+  transform-style: preserve-3d;
+}
+
+.orbit-3d-plane {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.orbit-3d-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 180, 220, 0.22);
+  box-shadow:
+    0 0 18px rgba(0, 153, 204, 0.12) inset,
+    0 8px 24px rgba(0, 0, 0, 0.25);
+  transform: translateZ(0);
+}
+
+.orbit-3d-ring-cross {
+  border-color: rgba(232, 247, 255, 0.28);
+  border-style: dashed;
+}
+
+.orbit-3d-spinner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  animation-name: orbit-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.orbit-3d-spinner-rev {
+  animation-direction: reverse;
+}
+
+.orbit-3d-sat {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin-left: -50%;
+  margin-top: -50%;
+  border-radius: 9999px;
+  /* sit on the tilted plane radius — foreshortening creates 3D depth */
+  transform: translate3d(var(--sat-r, 160px), 0, 0);
+  transform-style: preserve-3d;
+}
+
+.orbit-3d-sat-cross {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.orbit-3d-sat::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55), transparent 70%);
+  opacity: 0.7;
+}
+
+/* soft depth pulse while orbiting (reads more “solid” in 3D) */
+.orbit-3d-spinner .orbit-3d-sat {
+  animation: sat-depth-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes sat-depth-pulse {
+  0%,
+  100% {
+    filter: brightness(0.85);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
 @keyframes star-twinkle {
   0%,
   100% {

@@ -5,10 +5,35 @@ import { useEffect, useMemo, useState } from "react";
 import { useExperience } from "@/hooks/useExperience";
 import { SCENE_META, type SceneId } from "@/lib/experience";
 
-const ORBITS = [
-  { r: 120, dur: 14, count: 6, color: "bg-gvg-cyan" },
-  { r: 170, dur: 22, count: 8, color: "bg-gvg-cyan/70" },
-  { r: 220, dur: 30, count: 5, color: "bg-white" },
+/** Horizontal orbital belts — slower 3D rings around the title */
+const ORBIT_BELTS = [
+  { r: 132, dur: 38, count: 5, color: "#00c2e8", size: 5 },
+  { r: 178, dur: 52, count: 6, color: "#7ad8ef", size: 4 },
+  { r: 228, dur: 68, count: 4, color: "#ffffff", size: 3.5 },
+] as const;
+
+/** Left / right crossing satellite tracks (one each) */
+const CROSS_TRACKS = [
+  {
+    id: "cross-left",
+    r: 198,
+    dur: 46,
+    tiltY: -54,
+    tiltX: 58,
+    tiltZ: -22,
+    reverse: false,
+    color: "#00b7e0",
+  },
+  {
+    id: "cross-right",
+    r: 198,
+    dur: 54,
+    tiltY: 54,
+    tiltX: 58,
+    tiltZ: 22,
+    reverse: true,
+    color: "#e8f7ff",
+  },
 ] as const;
 
 export function StartGate() {
@@ -26,16 +51,13 @@ export function StartGate() {
     })),
   );
 
-  const satellites = useMemo(
+  const beltSats = useMemo(
     () =>
-      ORBITS.flatMap((orbit, oi) =>
-        Array.from({ length: orbit.count }, (_, i) => ({
-          id: `${oi}-${i}`,
-          r: orbit.r,
-          dur: orbit.dur,
-          color: orbit.color,
-          offset: (360 / orbit.count) * i,
-          size: oi === 1 ? 5 : 3.5,
+      ORBIT_BELTS.flatMap((belt, bi) =>
+        Array.from({ length: belt.count }, (_, i) => ({
+          id: `belt-${bi}-${i}`,
+          ...belt,
+          offset: (360 / belt.count) * i,
         })),
       ),
     [],
@@ -72,35 +94,88 @@ export function StartGate() {
       </div>
 
       <div className="relative z-10 flex max-w-3xl flex-col items-center text-center">
-        <div className="relative mb-2 grid place-items-center px-10 py-16 md:px-16 md:py-20">
-          <div className="pointer-events-none absolute inset-0 grid place-items-center">
-            {ORBITS.map((o) => (
+        <div className="relative mb-2 grid place-items-center px-10 py-20 md:px-20 md:py-24">
+          {/* 3D orbital stage */}
+          <div
+            className="orbit-3d-stage pointer-events-none absolute inset-0 grid place-items-center"
+            aria-hidden
+          >
+            {/* Equatorial belts (tilted → reads as 3D ellipses) */}
+            {ORBIT_BELTS.map((belt) => (
               <div
-                key={o.r}
-                className="absolute rounded-full border border-white/10"
-                style={{ width: o.r * 2, height: o.r * 2 }}
-              />
-            ))}
-            {satellites.map((sat) => (
-              <span
-                key={sat.id}
-                className="absolute left-1/2 top-1/2"
-                style={{
-                  animation: `orbit-spin ${sat.dur}s linear infinite`,
-                  animationDelay: `${(-(sat.offset / 360) * sat.dur).toFixed(3)}s`,
-                }}
+                key={belt.r}
+                className="orbit-3d-plane"
+                style={{ transform: "rotateX(66deg)" }}
               >
-                <span
-                  className={`block rounded-full shadow-[0_0_10px_rgba(255,255,255,0.85)] ${sat.color}`}
+                <div
+                  className="orbit-3d-ring"
                   style={{
-                    width: sat.size,
-                    height: sat.size,
-                    marginLeft: -sat.size / 2,
-                    marginTop: -sat.size / 2,
-                    transform: `translateX(${sat.r}px)`,
+                    width: belt.r * 2,
+                    height: belt.r * 2,
                   }}
                 />
-              </span>
+              </div>
+            ))}
+
+            {beltSats.map((sat) => (
+              <div
+                key={sat.id}
+                className="orbit-3d-plane"
+                style={{ transform: "rotateX(66deg)" }}
+              >
+                <div
+                  className="orbit-3d-spinner"
+                  style={{
+                    animationDuration: `${sat.dur}s`,
+                    animationDelay: `${(-(sat.offset / 360) * sat.dur).toFixed(3)}s`,
+                  }}
+                >
+                  <span
+                    className="orbit-3d-sat"
+                    style={{
+                      ["--sat-r" as string]: `${sat.r}px`,
+                      width: sat.size,
+                      height: sat.size,
+                      background: sat.color,
+                      boxShadow: `0 0 10px ${sat.color}, 0 0 18px rgba(0,180,220,0.45)`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+
+            {/* Left & right crossing satellite tracks (one each) */}
+            {CROSS_TRACKS.map((track) => (
+              <div
+                key={track.id}
+                className="orbit-3d-plane"
+                style={{
+                  transform: `rotateY(${track.tiltY}deg) rotateX(${track.tiltX}deg) rotateZ(${track.tiltZ}deg)`,
+                }}
+              >
+                <div
+                  className="orbit-3d-ring orbit-3d-ring-cross"
+                  style={{
+                    width: track.r * 2,
+                    height: track.r * 2,
+                  }}
+                />
+                <div
+                  className={`orbit-3d-spinner ${track.reverse ? "orbit-3d-spinner-rev" : ""}`}
+                  style={{ animationDuration: `${track.dur}s` }}
+                >
+                  <span
+                    className="orbit-3d-sat orbit-3d-sat-cross"
+                    style={{
+                      ["--sat-r" as string]: `${track.r}px`,
+                      width: 7,
+                      height: 7,
+                      background: track.color,
+                      boxShadow: `0 0 12px ${track.color}, 0 0 22px rgba(0,183,224,0.55)`,
+                    }}
+                  />
+                </div>
+              </div>
             ))}
           </div>
 
