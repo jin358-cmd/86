@@ -5,35 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useExperience } from "@/hooks/useExperience";
 import { SCENE_META, type SceneId } from "@/lib/experience";
 
-/** Horizontal orbital belts — slower 3D rings around the title */
-const ORBIT_BELTS = [
-  { r: 132, dur: 38, count: 5, color: "#00c2e8", size: 5 },
-  { r: 178, dur: 52, count: 6, color: "#7ad8ef", size: 4 },
-  { r: 228, dur: 68, count: 4, color: "#ffffff", size: 3.5 },
-] as const;
-
-/** Left / right crossing satellite tracks (one each) */
-const CROSS_TRACKS = [
-  {
-    id: "cross-left",
-    r: 198,
-    dur: 46,
-    tiltY: -54,
-    tiltX: 58,
-    tiltZ: -22,
-    reverse: false,
-    color: "#00b7e0",
-  },
-  {
-    id: "cross-right",
-    r: 198,
-    dur: 54,
-    tiltY: 54,
-    tiltX: 58,
-    tiltZ: 22,
-    reverse: true,
-    color: "#e8f7ff",
-  },
+/**
+ * Flat circular orbits centered on the title block.
+ * Ring diameter = 2r; satellites travel on the same r path.
+ */
+const ORBITS = [
+  { r: 120, dur: 28, count: 6, color: "bg-gvg-cyan" },
+  { r: 170, dur: 40, count: 8, color: "bg-gvg-cyan/70" },
+  { r: 220, dur: 54, count: 5, color: "bg-white" },
 ] as const;
 
 export function StartGate() {
@@ -51,13 +30,16 @@ export function StartGate() {
     })),
   );
 
-  const beltSats = useMemo(
+  const satellites = useMemo(
     () =>
-      ORBIT_BELTS.flatMap((belt, bi) =>
-        Array.from({ length: belt.count }, (_, i) => ({
-          id: `belt-${bi}-${i}`,
-          ...belt,
-          offset: (360 / belt.count) * i,
+      ORBITS.flatMap((orbit, oi) =>
+        Array.from({ length: orbit.count }, (_, i) => ({
+          id: `${oi}-${i}`,
+          r: orbit.r,
+          dur: orbit.dur,
+          color: orbit.color,
+          offset: (360 / orbit.count) * i,
+          size: oi === 1 ? 5 : 3.5,
         })),
       ),
     [],
@@ -94,107 +76,71 @@ export function StartGate() {
       </div>
 
       <div className="relative z-10 flex max-w-3xl flex-col items-center text-center">
-        <div className="relative mb-2 grid place-items-center px-10 py-20 md:px-20 md:py-24">
-          {/* 3D orbital stage */}
+        <div className="relative mb-2 grid min-h-[340px] w-full place-items-center px-10 py-16 md:min-h-[420px] md:px-16 md:py-20">
+          {/*
+            Single shared center for rings + satellites.
+            Each ring is a circle of radius r; each sat uses translateX(r)
+            so the trail sits exactly on the ring, around the title.
+          */}
           <div
-            className="orbit-3d-stage pointer-events-none absolute inset-0 grid place-items-center"
+            className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
             aria-hidden
           >
-            {/* Equatorial belts (tilted → reads as 3D ellipses) */}
-            {ORBIT_BELTS.map((belt) => (
+            {ORBITS.map((orbit) => (
               <div
-                key={belt.r}
-                className="orbit-3d-plane"
-                style={{ transform: "rotateX(66deg)" }}
-              >
-                <div
-                  className="orbit-3d-ring"
-                  style={{
-                    width: belt.r * 2,
-                    height: belt.r * 2,
-                  }}
-                />
-              </div>
-            ))}
-
-            {beltSats.map((sat) => (
-              <div
-                key={sat.id}
-                className="orbit-3d-plane"
-                style={{ transform: "rotateX(66deg)" }}
-              >
-                <div
-                  className="orbit-3d-spinner"
-                  style={{
-                    animationDuration: `${sat.dur}s`,
-                    animationDelay: `${(-(sat.offset / 360) * sat.dur).toFixed(3)}s`,
-                  }}
-                >
-                  <span
-                    className="orbit-3d-sat"
-                    style={{
-                      ["--sat-r" as string]: `${sat.r}px`,
-                      width: sat.size,
-                      height: sat.size,
-                      background: sat.color,
-                      boxShadow: `0 0 10px ${sat.color}, 0 0 18px rgba(0,180,220,0.45)`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-
-            {/* Left & right crossing satellite tracks (one each) */}
-            {CROSS_TRACKS.map((track) => (
-              <div
-                key={track.id}
-                className="orbit-3d-plane"
+                key={orbit.r}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gvg-cyan/25"
                 style={{
-                  transform: `rotateY(${track.tiltY}deg) rotateX(${track.tiltX}deg) rotateZ(${track.tiltZ}deg)`,
+                  width: orbit.r * 2,
+                  height: orbit.r * 2,
+                  boxShadow: "0 0 20px rgba(0,153,204,0.08) inset",
+                }}
+              />
+            ))}
+
+            {satellites.map((sat) => (
+              <span
+                key={sat.id}
+                className="absolute left-1/2 top-1/2"
+                style={{
+                  width: 0,
+                  height: 0,
+                  animation: `orbit-spin ${sat.dur}s linear infinite`,
+                  animationDelay: `${(-(sat.offset / 360) * sat.dur).toFixed(3)}s`,
                 }}
               >
-                <div
-                  className="orbit-3d-ring orbit-3d-ring-cross"
+                <span
+                  className={`absolute block rounded-full shadow-[0_0_10px_rgba(255,255,255,0.85)] ${sat.color}`}
                   style={{
-                    width: track.r * 2,
-                    height: track.r * 2,
+                    width: sat.size,
+                    height: sat.size,
+                    left: sat.r,
+                    top: -sat.size / 2,
+                    marginLeft: -sat.size / 2,
                   }}
                 />
-                <div
-                  className={`orbit-3d-spinner ${track.reverse ? "orbit-3d-spinner-rev" : ""}`}
-                  style={{ animationDuration: `${track.dur}s` }}
-                >
-                  <span
-                    className="orbit-3d-sat orbit-3d-sat-cross"
-                    style={{
-                      ["--sat-r" as string]: `${track.r}px`,
-                      width: 7,
-                      height: 7,
-                      background: track.color,
-                      boxShadow: `0 0 12px ${track.color}, 0 0 22px rgba(0,183,224,0.55)`,
-                    }}
-                  />
-                </div>
-              </div>
+              </span>
             ))}
           </div>
 
-          {/* Title stack — proportion & color hierarchy */}
-          <p className="relative z-10 font-mono text-[11px] font-medium tracking-[0.55em] text-gvg-cyan/90 md:text-sm md:tracking-[0.62em]">
-            GVG OS
-            <span className="mx-2 text-white/35">·</span>
-            <span className="text-white/75">GLOBAL PLATFORM</span>
-          </p>
-          <h1 className="relative z-10 mt-6 font-display text-[2.35rem] leading-[1.05] tracking-[0.18em] text-white md:text-6xl md:tracking-[0.2em] lg:text-[4.25rem]">
-            START
-            <span className="mt-1 block text-[0.72em] tracking-[0.28em] text-gvg-cyan">
-              EXPERIENCE
-            </span>
-          </h1>
-          <p className="relative z-10 mt-6 max-w-md font-body text-sm leading-relaxed text-white/55 md:text-[15px]">
-            科幻宇宙入口。以第一人稱穿越章節結點：Boot → Wear → Login → City →
-            World → Dashboard。
-          </p>
+          {/* Title stack — proportion & color hierarchy (orbit center) */}
+          <div className="relative z-10">
+            <p className="font-mono text-[11px] font-medium tracking-[0.55em] text-gvg-cyan/90 md:text-sm md:tracking-[0.62em]">
+              GVG OS
+              <span className="mx-2 text-white/35">·</span>
+              <span className="text-white/75">GLOBAL PLATFORM</span>
+            </p>
+            <h1 className="mt-6 font-display text-[2.35rem] leading-[1.05] tracking-[0.18em] text-white md:text-6xl md:tracking-[0.2em] lg:text-[4.25rem]">
+              START
+              <span className="mt-1 block text-[0.72em] tracking-[0.28em] text-gvg-cyan">
+                EXPERIENCE
+              </span>
+            </h1>
+            <p className="mt-6 max-w-md font-body text-sm leading-relaxed text-white/55 md:text-[15px]">
+              科幻宇宙入口。以第一人稱穿越章節結點：Boot → Wear → Login → City →
+              World → Dashboard。
+            </p>
+          </div>
         </div>
 
         <div
@@ -202,7 +148,6 @@ export function StartGate() {
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
         >
-          {/* Hover-only same-color radiate from rectangular button */}
           {hovering && !bursting ? (
             <>
               <span className="init-pulse-ring init-cyan" />
@@ -211,7 +156,6 @@ export function StartGate() {
             </>
           ) : null}
 
-          {/* Fine click burst */}
           {bursting && (
             <>
               <motion.span
