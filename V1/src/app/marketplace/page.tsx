@@ -1,4 +1,10 @@
-import { createSectionPage } from "@/components/platform/createSectionPage";
+import { PlatformShell } from "@/components/platform/PlatformShell";
+import { MarketplaceHub } from "@/components/commerce/MarketplaceHub";
 
-const Page = createSectionPage("/marketplace");
-export default Page;
+export default function MarketplacePage() {
+  return (
+    <PlatformShell defaultImage="/images/pages/page-marketplace.png">
+      <MarketplaceHub />
+    </PlatformShell>
+  );
+}

@@ -5,6 +5,7 @@
   --gvg-bg: #080808;
   --gvg-panel: #111111;
   --gvg-cyan: #00e5ff;
+  --gvg-purple: #a855ff;
   --gvg-danger: #ff1744;
   --gvg-text: #ececec;
   --gvg-muted: #8b8b8b;
@@ -15,6 +16,7 @@
   --color-gvg-bg: var(--gvg-bg);
   --color-gvg-panel: var(--gvg-panel);
   --color-gvg-cyan: var(--gvg-cyan);
+  --color-gvg-purple: var(--gvg-purple);
   --color-gvg-danger: var(--gvg-danger);
   --color-gvg-text: var(--gvg-text);
   --color-gvg-muted: var(--gvg-muted);

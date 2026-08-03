@@ -4,6 +4,7 @@ type ToneKind = "boot" | "ui" | "confirm" | "warn" | "whoosh";
 
 let audioCtx: AudioContext | null = null;
 let ambienceNodes: { stop: () => void } | null = null;
+let sfxLoopId: number | null = null;
 let muted = false;
 
 function ctx() {
@@ -20,7 +21,10 @@ function ctx() {
 
 export function setMuted(value: boolean) {
   muted = value;
-  if (muted) stopAmbience();
+  if (muted) {
+    stopAmbience();
+    stopSfxLoop();
+  }
 }
 
 export function isMuted() {
@@ -71,7 +75,7 @@ export function playTone(kind: ToneKind = "ui") {
   osc.stop(now + p.dur + 0.02);
 }
 
-/** Tech / cyber ambient bed: low drone + pulse + soft arpeggio */
+/** Continuous looping ambient BGM bed */
 export function startAmbience() {
   if (muted || ambienceNodes) return;
   const c = ctx();
@@ -123,7 +127,6 @@ export function startAmbience() {
   arp.connect(arpGain);
   arpGain.connect(master);
 
-  // Soft high shimmer
   const shimmer = c.createOscillator();
   shimmer.type = "sine";
   shimmer.frequency.value = 392;
@@ -132,12 +135,22 @@ export function startAmbience() {
   shimmer.connect(shimmerGain);
   shimmerGain.connect(master);
 
+  // Soft purple-ish fifth for cyber bed variety
+  const fifth = c.createOscillator();
+  fifth.type = "triangle";
+  fifth.frequency.value = 72;
+  const fifthGain = c.createGain();
+  fifthGain.gain.value = 0.08;
+  fifth.connect(fifthGain);
+  fifthGain.connect(filter);
+
   drone.start();
   pulse.start();
   lfo.start();
   arp.start();
   arpLfo.start();
   shimmer.start();
+  fifth.start();
 
   ambienceNodes = {
     stop: () => {
@@ -148,6 +161,7 @@ export function startAmbience() {
         arp.stop();
         arpLfo.stop();
         shimmer.stop();
+        fifth.stop();
       } catch {
         /* already stopped */
       }
@@ -160,4 +174,23 @@ export function startAmbience() {
 export function stopAmbience() {
   ambienceNodes?.stop();
   ambienceNodes = null;
+}
+
+/** Soft UI SFX that rotate continuously while experience is active */
+export function startSfxLoop() {
+  if (muted || sfxLoopId !== null) return;
+  const sequence: ToneKind[] = ["ui", "boot", "ui", "confirm", "ui", "whoosh"];
+  let i = 0;
+  sfxLoopId = window.setInterval(() => {
+    if (muted) return;
+    playTone(sequence[i % sequence.length]);
+    i += 1;
+  }, 4200);
+}
+
+export function stopSfxLoop() {
+  if (sfxLoopId !== null) {
+    window.clearInterval(sfxLoopId);
+    sfxLoopId = null;
+  }
 }

@@ -8,7 +8,7 @@ import { SCENE_META, SCENES } from "@/lib/experience";
 import { cn } from "@/lib/cn";
 
 export function ChromeHud() {
-  const { scene, sceneIndex, skip, muted, toggleMute, started } =
+  const { scene, sceneIndex, skip, muted, toggleMute, started, geo } =
     useExperience();
   const { time, date } = useHudClock();
 
@@ -53,7 +53,7 @@ export function ChromeHud() {
           >
             {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
-          {scene !== "hub" && (
+          {scene !== "dashboard" && (
             <button
               type="button"
               onClick={skip}
@@ -67,9 +67,13 @@ export function ChromeHud() {
       </motion.header>
 
       <aside className="pointer-events-none fixed left-4 top-24 z-[90] hidden flex-col gap-1 font-mono text-[10px] tracking-wider text-gvg-muted md:flex">
-        <span>LAT 25.0330</span>
-        <span>LON 121.5654</span>
-        <span>GPS · GVG-NODE-07</span>
+        <span>
+          LAT {geo ? geo.lat.toFixed(4) : "25.0330"}
+        </span>
+        <span>
+          LON {geo ? geo.lon.toFixed(4) : "121.5654"}
+        </span>
+        <span>GPS · {geo ? "USER-NODE" : "GVG-NODE-07"}</span>
         <span>{date}</span>
         <span className="text-gvg-cyan">{time}</span>
       </aside>
@@ -77,7 +81,7 @@ export function ChromeHud() {
       <aside className="pointer-events-none fixed right-4 top-24 z-[90] hidden flex-col items-end gap-1 font-mono text-[10px] tracking-wider text-gvg-muted md:flex">
         <span className="text-gvg-cyan">SIGNAL 98%</span>
         <span>AI CORE · STABLE</span>
-        <span>BGM · LIVE</span>
+        <span className="text-gvg-purple">BGM · LOOP</span>
         <span className="text-gvg-yellow">ONLINE</span>
       </aside>
     </>

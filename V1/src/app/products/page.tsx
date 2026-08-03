@@ -3,7 +3,7 @@ import { ProductCenter } from "@/components/commerce/ProductCenter";
 
 export default function ProductsPage() {
   return (
-    <PlatformShell>
+    <PlatformShell defaultImage="/images/categories/cat-health.png">
       <ProductCenter />
     </PlatformShell>
   );

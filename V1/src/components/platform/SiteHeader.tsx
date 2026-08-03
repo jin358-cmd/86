@@ -3,8 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PAGES } from "@/data/architecture";
+import { PAGE_IMAGES } from "@/data/commerce";
 import { cn } from "@/lib/cn";
-import { playTone, startAmbience, unlockAudio, setMuted, isMuted } from "@/lib/audio";
+import {
+  playTone,
+  startAmbience,
+  startSfxLoop,
+  unlockAudio,
+  setMuted,
+  isMuted,
+} from "@/lib/audio";
 import { useEffect, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 
@@ -16,14 +24,22 @@ const NAV = [
   ),
 ];
 
-
-export function SiteHeader() {
+export function SiteHeader({
+  onNavHover,
+  onNavLeave,
+}: {
+  onNavHover?: (href: string) => void;
+  onNavLeave?: () => void;
+} = {}) {
   const pathname = usePathname();
   const [muted, setMutedState] = useState(false);
 
   useEffect(() => {
     void unlockAudio().then(() => {
-      if (!isMuted()) startAmbience();
+      if (!isMuted()) {
+        startAmbience();
+        startSfxLoop();
+      }
     });
   }, []);
 
@@ -33,6 +49,7 @@ export function SiteHeader() {
         <Link
           href="/"
           onClick={() => playTone("ui")}
+          onMouseEnter={() => onNavHover?.("/")}
           className="flex items-center gap-3"
         >
           <span className="grid size-9 place-items-center border border-gvg-yellow bg-gvg-yellow/10 font-display text-xs text-gvg-yellow">
@@ -48,17 +65,25 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 xl:flex">
+        <nav
+          className="hidden items-center gap-1 xl:flex"
+          onMouseLeave={() => onNavLeave?.()}
+        >
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              onMouseEnter={() => playTone("ui")}
+              onMouseEnter={() => {
+                playTone("ui");
+                onNavHover?.(item.href);
+                // Prefetch visual switch via PAGE_IMAGES presence
+                void PAGE_IMAGES[item.href];
+              }}
               className={cn(
                 "px-2 py-1 font-hud text-[10px] tracking-[0.16em] transition",
                 pathname === item.href || pathname?.startsWith(`${item.href}/`)
                   ? "bg-gvg-yellow text-black"
-                  : "text-gvg-muted hover:text-gvg-yellow",
+                  : "text-gvg-muted hover:text-gvg-purple",
               )}
             >
               {item.title.split(" ")[0]}
@@ -66,6 +91,7 @@ export function SiteHeader() {
           ))}
           <Link
             href="/admin"
+            onMouseEnter={() => onNavHover?.("/admin")}
             className="ml-2 border border-gvg-cyan/40 px-2 py-1 font-hud text-[10px] tracking-[0.16em] text-gvg-cyan"
           >
             ADMIN
@@ -78,7 +104,10 @@ export function SiteHeader() {
             setMutedState((m) => {
               const next = !m;
               setMuted(next);
-              if (!next) startAmbience();
+              if (!next) {
+                startAmbience();
+                startSfxLoop();
+              }
               return next;
             });
           }}

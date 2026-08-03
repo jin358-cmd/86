@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+type MeteorHue = "purple" | "white" | "yellow" | "cyan";
+
 type Meteor = {
   x: number;
   y: number;
@@ -9,7 +11,7 @@ type Meteor = {
   vy: number;
   len: number;
   width: number;
-  hue: "yellow" | "cyan";
+  hue: MeteorHue;
   lag: number;
 };
 
@@ -19,9 +21,19 @@ type Spark = {
   life: number;
   vx: number;
   vy: number;
+  purple: boolean;
 };
 
-const METEOR_COUNT = 5;
+const METEOR_COUNT = 7;
+const HUES: MeteorHue[] = [
+  "purple",
+  "white",
+  "purple",
+  "white",
+  "yellow",
+  "cyan",
+  "purple",
+];
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -52,10 +64,10 @@ export function CursorTrail() {
       y: my,
       vx: 0,
       vy: 0,
-      len: 28 + i * 10,
-      width: 1.6 + i * 0.25,
-      hue: i % 2 === 0 ? "yellow" : "cyan",
-      lag: 0.18 + i * 0.08,
+      len: 30 + i * 9,
+      width: 1.5 + i * 0.22,
+      hue: HUES[i % HUES.length],
+      lag: 0.16 + i * 0.07,
     }));
 
     const resize = () => {
@@ -82,14 +94,22 @@ export function CursorTrail() {
       const tailY = m.y - uy * m.len;
 
       const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
-      if (m.hue === "yellow") {
+      if (m.hue === "purple") {
+        grad.addColorStop(0, "rgba(168, 85, 255, 0)");
+        grad.addColorStop(0.4, "rgba(168, 85, 255, 0.4)");
+        grad.addColorStop(1, "rgba(230, 200, 255, 0.95)");
+      } else if (m.hue === "white") {
+        grad.addColorStop(0, "rgba(255, 255, 255, 0)");
+        grad.addColorStop(0.45, "rgba(255, 255, 255, 0.35)");
+        grad.addColorStop(1, "rgba(255, 255, 255, 0.95)");
+      } else if (m.hue === "yellow") {
         grad.addColorStop(0, "rgba(252, 238, 10, 0)");
-        grad.addColorStop(0.45, "rgba(252, 238, 10, 0.35)");
-        grad.addColorStop(1, "rgba(255, 255, 220, 0.95)");
+        grad.addColorStop(0.45, "rgba(252, 238, 10, 0.3)");
+        grad.addColorStop(1, "rgba(255, 255, 220, 0.9)");
       } else {
         grad.addColorStop(0, "rgba(0, 229, 255, 0)");
-        grad.addColorStop(0.45, "rgba(0, 229, 255, 0.35)");
-        grad.addColorStop(1, "rgba(200, 250, 255, 0.95)");
+        grad.addColorStop(0.45, "rgba(0, 229, 255, 0.3)");
+        grad.addColorStop(1, "rgba(200, 250, 255, 0.9)");
       }
 
       ctx.strokeStyle = grad;
@@ -102,10 +122,14 @@ export function CursorTrail() {
 
       ctx.beginPath();
       ctx.fillStyle =
-        m.hue === "yellow"
-          ? "rgba(252, 238, 10, 0.9)"
-          : "rgba(0, 229, 255, 0.9)";
-      ctx.arc(m.x, m.y, m.width * 1.1, 0, Math.PI * 2);
+        m.hue === "purple"
+          ? "rgba(180, 110, 255, 0.95)"
+          : m.hue === "white"
+            ? "rgba(255, 255, 255, 0.95)"
+            : m.hue === "yellow"
+              ? "rgba(252, 238, 10, 0.9)"
+              : "rgba(0, 229, 255, 0.9)";
+      ctx.arc(m.x, m.y, m.width * 1.15, 0, Math.PI * 2);
       ctx.fill();
     };
 
@@ -117,7 +141,6 @@ export function CursorTrail() {
       prevMx = mx;
       prevMy = my;
 
-      // spawn soft sparks when moving
       const moveSpeed = Math.hypot(dx, dy);
       if (moveSpeed > 1.5) {
         sparks.push({
@@ -126,16 +149,14 @@ export function CursorTrail() {
           life: 1,
           vx: -dx * 0.08 + (Math.random() - 0.5) * 0.8,
           vy: -dy * 0.08 + (Math.random() - 0.5) * 0.8,
+          purple: Math.random() > 0.45,
         });
-        if (sparks.length > 40) sparks.splice(0, sparks.length - 40);
+        if (sparks.length > 48) sparks.splice(0, sparks.length - 48);
       }
 
       for (const m of meteors) {
-        const tx = mx;
-        const ty = my;
-        // critically-damped-ish smooth follow
-        m.vx += (tx - m.x) * m.lag;
-        m.vy += (ty - m.y) * m.lag;
+        m.vx += (mx - m.x) * m.lag;
+        m.vy += (my - m.y) * m.lag;
         m.vx *= 0.78;
         m.vy *= 0.78;
         m.x += m.vx;
@@ -153,15 +174,20 @@ export function CursorTrail() {
           continue;
         }
         ctx.beginPath();
-        ctx.fillStyle = `rgba(252, 238, 10, ${s.life * 0.5})`;
-        ctx.arc(s.x, s.y, 1.6 * s.life, 0, Math.PI * 2);
+        ctx.fillStyle = s.purple
+          ? `rgba(168, 85, 255, ${s.life * 0.55})`
+          : `rgba(255, 255, 255, ${s.life * 0.55})`;
+        ctx.arc(s.x, s.y, 1.7 * s.life, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // subtle core at pointer
       ctx.beginPath();
-      ctx.fillStyle = "rgba(252, 238, 10, 0.75)";
-      ctx.arc(mx, my, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      ctx.arc(mx, my, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(168, 85, 255, 0.55)";
+      ctx.arc(mx, my, 4.2, 0, Math.PI * 2);
       ctx.fill();
 
       raf = requestAnimationFrame(draw);
