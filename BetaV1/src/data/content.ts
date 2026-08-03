@@ -8,10 +8,10 @@ export const BOOT_LINES = [
 ] as const;
 
 export const GLASS_SCAN_LINES = [
-  "Scanning User...",
-  "Eye Tracking...",
-  "Identity Verification...",
-  "Brainwave Stable...",
+  "Open-field VR sync...",
+  "Night City skyline locked...",
+  "Depth / parallax stable...",
+  "Panoramic feed online...",
 ] as const;
 
 export const WEAR_PROGRESS = [0, 18, 35, 61, 82, 100] as const;

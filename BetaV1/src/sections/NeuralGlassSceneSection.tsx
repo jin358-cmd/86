@@ -29,39 +29,45 @@ export function NeuralGlassSceneSection() {
 
   return (
     <section className="relative min-h-[100dvh] overflow-hidden">
+      {/* Full-bleed VR panorama — no frame / panel occlusion over the city */}
       <div className="absolute inset-0">
         <NeuralGlassCanvas />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70" />
 
-      <div className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-end px-6 pb-16 pt-28 md:justify-center md:pb-0">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-panel w-full max-w-md px-5 py-4"
-        >
-          <p className="font-display text-xs tracking-[0.35em] text-gvg-yellow">
-            NEURAL GLASS
+      {/* Thin edge HUD only — center stays clear */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between px-5 pt-6 md:px-8 md:pt-8">
+        <div>
+          <p className="font-display text-xs tracking-[0.4em] text-gvg-yellow">
+            VR OPTICS
           </p>
-          <p className="mt-2 font-body text-sm text-gvg-muted">
-            Futuristic optics calibrating. Move your cursor to inspect the
-            frame.
+          <p className="mt-1 font-mono text-[10px] tracking-[0.28em] text-gvg-cyan">
+            PANORAMIC · NIGHT CITY FEED
           </p>
-          <ul className="mt-4 space-y-2 font-mono text-xs tracking-wider">
-            <AnimatePresence>
-              {GLASS_SCAN_LINES.slice(0, scan).map((line) => (
-                <motion.li
-                  key={line}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-gvg-cyan"
-                >
-                  {line}
-                </motion.li>
-              ))}
-            </AnimatePresence>
-          </ul>
-        </motion.div>
+        </div>
+        <p className="font-mono text-[10px] tracking-[0.22em] text-white/45">
+          LOOK TO EXPLORE
+        </p>
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-5 pb-10 md:px-8 md:pb-12">
+        <p className="mb-3 max-w-lg font-body text-sm text-white/60 md:text-[15px]">
+          Full-field Neural Link view — no frame occlusion. Move the cursor to
+          look across the night megacity skyline.
+        </p>
+        <ul className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] tracking-wider">
+          <AnimatePresence>
+            {GLASS_SCAN_LINES.slice(0, scan).map((line) => (
+              <motion.li
+                key={line}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-gvg-cyan"
+              >
+                {line}
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </ul>
       </div>
     </section>
   );
