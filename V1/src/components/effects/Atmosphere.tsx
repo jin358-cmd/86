@@ -8,10 +8,12 @@ export function Atmosphere({
   flash,
   shake,
   distort,
+  homeStreaks,
 }: {
   flash?: boolean;
   shake?: boolean;
   distort?: boolean;
+  homeStreaks?: boolean;
 }) {
   const [glitch, setGlitch] = useState(false);
 
@@ -42,6 +44,9 @@ export function Atmosphere({
       <div className="scanlines absolute inset-0 opacity-50" />
       <div className="noise absolute inset-0 opacity-[0.03]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(0,153,204,0.08),transparent_36%),radial-gradient(circle_at_82%_68%,rgba(212,20,122,0.06),transparent_40%)]" />
+      {homeStreaks ? (
+        <div className="gvg-magenta-streaks absolute inset-0 opacity-55" />
+      ) : null}
 
       <AnimatePresence>
         {glitch && (

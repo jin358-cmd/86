@@ -7,6 +7,10 @@ import { CursorTrail } from "@/components/effects/CursorTrail";
 import { FloatingDust } from "@/components/effects/FloatingDust";
 import { ChromeHud } from "@/components/hud/ChromeHud";
 import {
+  FirstPersonTransit,
+  StartGate,
+} from "@/components/experience/StartGate";
+import {
   ExperienceProvider,
   useExperience,
 } from "@/hooks/useExperience";
@@ -17,72 +21,46 @@ import { LoginScene } from "@/sections/LoginScene";
 import { CityRevealScene } from "@/sections/CityRevealScene";
 import { WorldIntroScene } from "@/sections/WorldIntroScene";
 import { DashboardScene } from "@/sections/DashboardScene";
-
-function StartGate() {
-  const { begin, started } = useExperience();
-  if (started) return null;
-
-  return (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-gvg-bg px-6">
-      <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,180,255,0.18),transparent_45%),radial-gradient(circle_at_70%_80%,rgba(255,45,149,0.12),transparent_40%)]" />
-      </div>
-      <div className="relative z-10 max-w-lg text-center">
-        <p className="font-mono text-xs tracking-[0.4em] text-gvg-cyan">
-          GVG OS · GLOBAL PLATFORM
-        </p>
-        <h1 className="mt-4 font-display text-4xl tracking-[0.14em] text-gvg-ink md:text-6xl">
-          START EXPERIENCE
-        </h1>
-        <p className="mt-4 font-body text-gvg-muted">
-          進入 Global Vista Group 電影級品牌入口。點擊後啟動科技流動 BGM 與 HUD
-          特效。
-        </p>
-        <button
-          type="button"
-          onClick={() => void begin()}
-          className="mt-8 border border-gvg-cyan bg-gvg-cyan px-8 py-3 font-display text-sm tracking-[0.28em] text-white transition hover:bg-transparent hover:text-gvg-cyan"
-        >
-          INITIALIZE
-        </button>
-        <p className="mt-4 font-mono text-[10px] tracking-wider text-gvg-muted">
-          AUDIO + VISUAL SYSTEMS WILL ENGAGE
-        </p>
-      </div>
-    </div>
-  );
-}
+import type { SceneId } from "@/lib/experience";
 
 function SceneStage() {
-  const { scene, transitioning, started } = useExperience();
+  const { scene, transitioning, started, transitFrom, transitTo } =
+    useExperience();
   const [jackIn, setJackIn] = useState(false);
   useLenis(started && scene === "dashboard");
 
   return (
     <>
-      <Atmosphere />
+      <Atmosphere homeStreaks />
       <CursorTrail />
       <ChromeHud />
       <StartGate />
+      <FirstPersonTransit
+        from={transitFrom}
+        to={transitTo}
+        active={started && transitioning}
+      />
 
       {started && (
         <div
           className={
             transitioning || jackIn
-              ? "pointer-events-none opacity-40 blur-sm"
+              ? "pointer-events-none opacity-30 blur-sm"
               : ""
           }
         >
+          {/* Magenta elongated streaks on cinematic homepage path */}
+          <div className="pointer-events-none fixed inset-0 z-[1] gvg-magenta-streaks opacity-50" />
           {(scene === "boot" || scene === "wear" || scene === "login") && (
             <FloatingDust />
           )}
           <AnimatePresence mode="wait">
             <motion.div
               key={scene}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
+              initial={{ opacity: 0, scale: 1.04 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.55 }}
             >
               {scene === "boot" && <BootScene />}
               {scene === "wear" && <WearScene onJackInEffects={setJackIn} />}
@@ -92,9 +70,24 @@ function SceneStage() {
               {scene === "dashboard" && <DashboardScene />}
             </motion.div>
           </AnimatePresence>
+
+          <ChapterNodeBadge scene={scene} />
         </div>
       )}
     </>
+  );
+}
+
+function ChapterNodeBadge({ scene }: { scene: SceneId }) {
+  return (
+    <div className="pointer-events-none fixed bottom-6 left-1/2 z-[90] -translate-x-1/2">
+      <div className="glass-panel flex items-center gap-3 px-4 py-2">
+        <span className="size-2 animate-pulse rounded-full bg-gvg-magenta shadow-[0_0_10px_rgba(212,20,122,0.8)]" />
+        <p className="font-mono text-[10px] tracking-[0.28em] text-gvg-ink">
+          CHAPTER NODE · {scene.toUpperCase()} · START / END
+        </p>
+      </div>
+    </div>
   );
 }
 

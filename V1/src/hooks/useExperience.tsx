@@ -31,6 +31,8 @@ type ExperienceContextValue = {
   scene: SceneId;
   sceneIndex: number;
   transitioning: boolean;
+  transitFrom: SceneId | null;
+  transitTo: SceneId | null;
   selectedMission: MissionId;
   muted: boolean;
   goTo: (scene: SceneId) => void;
@@ -44,23 +46,36 @@ type ExperienceContextValue = {
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 
+const TRANSIT_MS = 1100;
+
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [scene, setScene] = useState<SceneId>("boot");
   const [started, setStarted] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [transitFrom, setTransitFrom] = useState<SceneId | null>(null);
+  const [transitTo, setTransitTo] = useState<SceneId | null>(null);
   const [selectedMission, setSelectedMission] = useState<MissionId>("landing");
   const [muted, setMutedState] = useState(false);
 
   const sceneIndex = SCENES.indexOf(scene);
 
-  const goTo = useCallback((next: SceneId) => {
-    setTransitioning(true);
-    playTone("whoosh");
-    window.setTimeout(() => {
-      setScene(next);
-      setTransitioning(false);
-    }, 420);
-  }, []);
+  const goTo = useCallback(
+    (next: SceneId) => {
+      setTransitFrom(scene);
+      setTransitTo(next);
+      setTransitioning(true);
+      playTone("whoosh");
+      window.setTimeout(() => {
+        setScene(next);
+        setTransitioning(false);
+        window.setTimeout(() => {
+          setTransitFrom(null);
+          setTransitTo(null);
+        }, 180);
+      }, TRANSIT_MS);
+    },
+    [scene],
+  );
 
   const advance = useCallback(() => {
     const n = nextScene(scene);
@@ -132,6 +147,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       scene,
       sceneIndex,
       transitioning,
+      transitFrom,
+      transitTo,
       selectedMission,
       muted,
       goTo,
@@ -146,6 +163,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       scene,
       sceneIndex,
       transitioning,
+      transitFrom,
+      transitTo,
       selectedMission,
       muted,
       goTo,

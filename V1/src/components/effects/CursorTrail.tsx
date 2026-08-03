@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 type TrailPoint = {
   x: number;
   y: number;
-  life: number;
 };
 
 type Shard = {
@@ -14,13 +13,12 @@ type Shard = {
   vx: number;
   vy: number;
   life: number;
-  maxLife: number;
   len: number;
   hue: "cyan" | "magenta" | "white";
 };
 
-const TRAIL_MAX = 10;
-const SHARD_BURST = 7;
+const TRAIL_MAX = 28;
+const SHARD_BURST = 12;
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,9 +30,9 @@ export function CursorTrail() {
     if (!ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    if (reduced || coarse) return;
+    if (reduced) return;
 
+    // Always enable custom cursor on fine pointers; also on coarse if user moves
     document.body.classList.add("gvg-cursor-active");
 
     let w = 0;
@@ -62,10 +60,10 @@ export function CursorTrail() {
     };
 
     const spawnBurst = (x: number, y: number, speed: number) => {
-      const count = SHARD_BURST + Math.floor(Math.min(speed / 8, 4));
+      const count = SHARD_BURST + Math.floor(Math.min(speed / 6, 8));
       for (let i = 0; i < count; i += 1) {
-        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.35;
-        const force = 1.4 + Math.random() * 2.2 + speed * 0.04;
+        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+        const force = 3.2 + Math.random() * 4.8 + speed * 0.08;
         const hues: Shard["hue"][] = ["cyan", "magenta", "white"];
         shards.push({
           x,
@@ -73,12 +71,11 @@ export function CursorTrail() {
           vx: Math.cos(angle) * force,
           vy: Math.sin(angle) * force,
           life: 1,
-          maxLife: 1,
-          len: 6 + Math.random() * 8,
+          len: 22 + Math.random() * 28,
           hue: hues[i % hues.length],
         });
       }
-      if (shards.length > 90) shards.splice(0, shards.length - 90);
+      if (shards.length > 140) shards.splice(0, shards.length - 140);
     };
 
     const onMove = (e: PointerEvent) => {
@@ -101,30 +98,31 @@ export function CursorTrail() {
       prevMx = mx;
       prevMy = my;
 
-      // Drag lag — short trailing follow
-      dragX += (mx - dragX) * 0.38;
-      dragY += (my - dragY) * 0.38;
+      // Longer drag lag for stretched trail
+      dragX += (mx - dragX) * 0.18;
+      dragY += (my - dragY) * 0.18;
 
-      trail.unshift({ x: dragX, y: dragY, life: 1 });
+      trail.unshift({ x: dragX, y: dragY });
       if (trail.length > TRAIL_MAX) trail.pop();
 
       burstCooldown -= 1;
-      if (moveSpeed > 2.2 && burstCooldown <= 0) {
+      if (moveSpeed > 1.4 && burstCooldown <= 0) {
         spawnBurst(mx, my, moveSpeed);
-        burstCooldown = 2;
+        burstCooldown = 1;
       }
 
-      // Short drag ribbon
+      // Elongated drag ribbon
       if (trail.length > 1) {
         for (let i = 0; i < trail.length - 1; i += 1) {
           const a = trail[i];
           const b = trail[i + 1];
-          const alpha = (1 - i / trail.length) * 0.55;
+          const alpha = (1 - i / trail.length) * 0.7;
           const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
           grad.addColorStop(0, `rgba(0, 153, 204, ${alpha})`);
-          grad.addColorStop(1, `rgba(212, 20, 122, ${alpha * 0.6})`);
+          grad.addColorStop(0.55, `rgba(212, 20, 122, ${alpha * 0.75})`);
+          grad.addColorStop(1, `rgba(255, 255, 255, ${alpha * 0.35})`);
           ctx.strokeStyle = grad;
-          ctx.lineWidth = Math.max(1.2, 3.2 - i * 0.22);
+          ctx.lineWidth = Math.max(1, 4.2 - i * 0.12);
           ctx.lineCap = "round";
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
@@ -133,14 +131,14 @@ export function CursorTrail() {
         }
       }
 
-      // Outward burst shards (short length)
+      // Long outward burst shards
       for (let i = shards.length - 1; i >= 0; i -= 1) {
         const s = shards[i];
         s.x += s.vx;
         s.y += s.vy;
-        s.vx *= 0.9;
-        s.vy *= 0.9;
-        s.life -= 0.055;
+        s.vx *= 0.935;
+        s.vy *= 0.935;
+        s.life -= 0.028;
         if (s.life <= 0) {
           shards.splice(i, 1);
           continue;
@@ -148,29 +146,33 @@ export function CursorTrail() {
         const speed = Math.hypot(s.vx, s.vy) || 0.001;
         const ux = s.vx / speed;
         const uy = s.vy / speed;
-        const len = s.len * s.life;
+        const len = s.len * (0.45 + s.life * 0.55);
         const tx = s.x - ux * len;
         const ty = s.y - uy * len;
         const grad = ctx.createLinearGradient(tx, ty, s.x, s.y);
         grad.addColorStop(0, colorFor(s.hue, 0));
-        grad.addColorStop(1, colorFor(s.hue, s.life * 0.9));
+        grad.addColorStop(1, colorFor(s.hue, s.life * 0.95));
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.4;
+        ctx.lineWidth = 1.7;
         ctx.beginPath();
         ctx.moveTo(tx, ty);
         ctx.lineTo(s.x, s.y);
         ctx.stroke();
       }
 
-      // Core pointer
+      // Always-visible core pointer
       ctx.beginPath();
-      ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-      ctx.arc(mx, my, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(212, 20, 122, 0.35)";
+      ctx.arc(mx, my, 10, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(0, 153, 204, 0.85)";
-      ctx.lineWidth = 1.5;
-      ctx.arc(mx, my, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.98)";
+      ctx.arc(mx, my, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(0, 153, 204, 0.95)";
+      ctx.lineWidth = 1.8;
+      ctx.arc(mx, my, 6.5, 0, Math.PI * 2);
       ctx.stroke();
 
       raf = requestAnimationFrame(draw);
@@ -192,7 +194,7 @@ export function CursorTrail() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[95]"
+      className="pointer-events-none fixed inset-0 z-[120]"
       aria-hidden
     />
   );
