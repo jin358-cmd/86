@@ -1,8 +1,12 @@
 # V1 — GVG OS Global Platform
 
-Previous release snapshot (kept for reference).
+Active release (current deploy source).
 
-Current active version: [`../V2`](../V2)
+Saved snapshot of a later design pass: [`../V2`](../V2)
+
+## Flow
+
+`INITIALIZE` → Boot → Wear → Login → City → World → Dashboard
 
 ## Run
 

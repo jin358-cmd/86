@@ -6,24 +6,24 @@ GVG OS — Global Vista Group cinematic platform.
 
 | Version | Path | Notes |
 |--------|------|--------|
-| **V2** (current) | [`V2/`](./V2) | Saved current design — cosmos entry, light cyberpunk, marketplace |
-| V1 | [`V1/`](./V1) | Previous release snapshot |
+| **V1** (current) | [`V1/`](./V1) | Active release — live GitHub Pages deploy |
+| V2 | [`V2/`](./V2) | Saved design snapshot |
 
 - Live: https://jin358-cmd.github.io/86/
-- Active deploy source: `V2/`
-
-## Run V2
-
-```bash
-cd V2
-npm install
-npm run dev
-```
+- Active deploy source: `V1/`
 
 ## Run V1
 
 ```bash
 cd V1
+npm install
+npm run dev
+```
+
+## Run V2
+
+```bash
+cd V2
 npm install
 npm run dev
 ```
