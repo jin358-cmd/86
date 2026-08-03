@@ -2,11 +2,26 @@
 
 import { useEffect, useRef } from "react";
 
-type Particle = {
+type Meteor = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  len: number;
+  width: number;
+  hue: "yellow" | "cyan";
+  lag: number;
+};
+
+type Spark = {
   x: number;
   y: number;
   life: number;
+  vx: number;
+  vy: number;
 };
+
+const METEOR_COUNT = 5;
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,87 +36,136 @@ export function CursorTrail() {
     const coarse = window.matchMedia("(pointer: coarse)").matches;
     if (reduced || coarse) return;
 
+    document.body.classList.add("gvg-cursor-active");
+
     let w = 0;
     let h = 0;
-    let mx = -100;
-    let my = -100;
-    let tx = -100;
-    let ty = -100;
-    const particles: Particle[] = [];
+    let mx = window.innerWidth / 2;
+    let my = window.innerHeight / 2;
+    let prevMx = mx;
+    let prevMy = my;
     let raf = 0;
+    const sparks: Spark[] = [];
+
+    const meteors: Meteor[] = Array.from({ length: METEOR_COUNT }, (_, i) => ({
+      x: mx,
+      y: my,
+      vx: 0,
+      vy: 0,
+      len: 28 + i * 10,
+      width: 1.6 + i * 0.25,
+      hue: i % 2 === 0 ? "yellow" : "cyan",
+      lag: 0.18 + i * 0.08,
+    }));
 
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      canvas.width = w * window.devicePixelRatio;
-      canvas.height = h * window.devicePixelRatio;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
-      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const onMove = (e: PointerEvent) => {
       mx = e.clientX;
       my = e.clientY;
-      for (let i = 0; i < 2; i += 1) {
-        particles.push({
-          x: mx + (Math.random() - 0.5) * 8,
-          y: my + (Math.random() - 0.5) * 8,
-          life: 1,
-        });
+    };
+
+    const drawMeteor = (m: Meteor) => {
+      const speed = Math.hypot(m.vx, m.vy) || 0.001;
+      const ux = m.vx / speed;
+      const uy = m.vy / speed;
+      const tailX = m.x - ux * m.len;
+      const tailY = m.y - uy * m.len;
+
+      const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
+      if (m.hue === "yellow") {
+        grad.addColorStop(0, "rgba(252, 238, 10, 0)");
+        grad.addColorStop(0.45, "rgba(252, 238, 10, 0.35)");
+        grad.addColorStop(1, "rgba(255, 255, 220, 0.95)");
+      } else {
+        grad.addColorStop(0, "rgba(0, 229, 255, 0)");
+        grad.addColorStop(0.45, "rgba(0, 229, 255, 0.35)");
+        grad.addColorStop(1, "rgba(200, 250, 255, 0.95)");
       }
-      if (particles.length > 80) particles.splice(0, particles.length - 80);
+
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = m.width;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(m.x, m.y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.fillStyle =
+        m.hue === "yellow"
+          ? "rgba(252, 238, 10, 0.9)"
+          : "rgba(0, 229, 255, 0.9)";
+      ctx.arc(m.x, m.y, m.width * 1.1, 0, Math.PI * 2);
+      ctx.fill();
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
-      tx += (mx - tx) * 0.35;
-      ty += (my - ty) * 0.35;
 
-      // trailing particles
-      for (let i = particles.length - 1; i >= 0; i -= 1) {
-        const p = particles[i];
-        p.life -= 0.035;
-        if (p.life <= 0) {
-          particles.splice(i, 1);
+      const dx = mx - prevMx;
+      const dy = my - prevMy;
+      prevMx = mx;
+      prevMy = my;
+
+      // spawn soft sparks when moving
+      const moveSpeed = Math.hypot(dx, dy);
+      if (moveSpeed > 1.5) {
+        sparks.push({
+          x: mx,
+          y: my,
+          life: 1,
+          vx: -dx * 0.08 + (Math.random() - 0.5) * 0.8,
+          vy: -dy * 0.08 + (Math.random() - 0.5) * 0.8,
+        });
+        if (sparks.length > 40) sparks.splice(0, sparks.length - 40);
+      }
+
+      for (const m of meteors) {
+        const tx = mx;
+        const ty = my;
+        // critically-damped-ish smooth follow
+        m.vx += (tx - m.x) * m.lag;
+        m.vy += (ty - m.y) * m.lag;
+        m.vx *= 0.78;
+        m.vy *= 0.78;
+        m.x += m.vx;
+        m.y += m.vy;
+        drawMeteor(m);
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i -= 1) {
+        const s = sparks[i];
+        s.life -= 0.04;
+        s.x += s.vx;
+        s.y += s.vy;
+        if (s.life <= 0) {
+          sparks.splice(i, 1);
           continue;
         }
         ctx.beginPath();
-        ctx.fillStyle = `rgba(252, 238, 10, ${p.life * 0.45})`;
-        ctx.arc(p.x, p.y, 2.2 * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(252, 238, 10, ${s.life * 0.5})`;
+        ctx.arc(s.x, s.y, 1.6 * s.life, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // outer cyan ring
+      // subtle core at pointer
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(0, 229, 255, 0.55)";
-      ctx.lineWidth = 1;
-      ctx.arc(tx, ty, 16, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // inner yellow core
-      ctx.beginPath();
-      ctx.fillStyle = "rgba(252, 238, 10, 0.85)";
-      ctx.arc(tx, ty, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(252, 238, 10, 0.75)";
+      ctx.arc(mx, my, 2.4, 0, Math.PI * 2);
       ctx.fill();
-
-      // crosshair ticks
-      ctx.strokeStyle = "rgba(252, 238, 10, 0.4)";
-      ctx.beginPath();
-      ctx.moveTo(tx - 22, ty);
-      ctx.lineTo(tx - 12, ty);
-      ctx.moveTo(tx + 12, ty);
-      ctx.lineTo(tx + 22, ty);
-      ctx.moveTo(tx, ty - 22);
-      ctx.lineTo(tx, ty - 12);
-      ctx.moveTo(tx, ty + 12);
-      ctx.lineTo(tx, ty + 22);
-      ctx.stroke();
 
       raf = requestAnimationFrame(draw);
     };
-
-    document.body.classList.add("gvg-cursor-active");
 
     resize();
     window.addEventListener("resize", resize);

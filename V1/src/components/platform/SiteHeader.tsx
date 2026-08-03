@@ -8,7 +8,14 @@ import { playTone, startAmbience, unlockAudio, setMuted, isMuted } from "@/lib/a
 import { useEffect, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 
-const NAV = PAGES.filter((p) => p.href !== "/").slice(0, 8);
+const NAV = [
+  ...PAGES.filter((p) =>
+    ["/company", "/trade", "/marketplace", "/products", "/dashboard", "/commerce"].includes(
+      p.href,
+    ),
+  ),
+];
+
 
 export function SiteHeader() {
   const pathname = usePathname();

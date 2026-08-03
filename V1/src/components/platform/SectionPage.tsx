@@ -1,8 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PAGE_DETAILS, PAGES, type PageLink } from "@/data/architecture";
+import { PAGE_IMAGES } from "@/data/commerce";
 
 export function SectionPage({ page }: { page: PageLink }) {
   const detail = PAGE_DETAILS[page.href];
+  const image = PAGE_IMAGES[page.href];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
@@ -16,6 +19,23 @@ export function SectionPage({ page }: { page: PageLink }) {
         {page.zh}
       </p>
       <p className="mt-4 max-w-2xl font-body text-gvg-muted">{page.blurb}</p>
+
+      {image ? (
+        <div className="relative mt-8 aspect-[16/7] overflow-hidden border border-white/10">
+          <Image
+            src={image}
+            alt={page.title}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+          <p className="absolute bottom-3 left-4 font-mono text-[10px] tracking-[0.24em] text-gvg-cyan">
+            VISFEED // {page.code}
+          </p>
+        </div>
+      ) : null}
 
       {detail ? (
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">

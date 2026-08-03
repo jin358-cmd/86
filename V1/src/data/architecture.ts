@@ -110,6 +110,22 @@ export const PAGES: PageLink[] = [
     phase: 2,
   },
   {
+    href: "/commerce",
+    code: "07B",
+    title: "Ecommerce Architecture",
+    zh: "電商平台架構",
+    blurb: "前台商城、賣家中心、交易營運、結算清算與信任合規分層。",
+    phase: 2,
+  },
+  {
+    href: "/products",
+    code: "07C",
+    title: "Product Center",
+    zh: "商品中心",
+    blurb: "廠家、代理與經銷商可直接上架商品、管理庫存與報價。",
+    phase: 2,
+  },
+  {
     href: "/dashboard",
     code: "08",
     title: "AI Dashboard",
@@ -290,6 +306,28 @@ export const PAGE_DETAILS: Record<
     headline: "GVG Marketplace",
     points: ["B2B 交易", "B2C 通路", "OEM 專區", "品牌館", "採購中心"],
     actions: ["進入商城", "開設品牌館", "成為供應商"],
+  },
+  "/commerce": {
+    headline: "Ecommerce Platform Stack",
+    points: [
+      "Storefront 前台商城",
+      "Seller Hub 賣家中心",
+      "Trade Ops 詢價/訂單/物流",
+      "Settlement 多幣別結算",
+      "Trust & Compliance 認證合規",
+    ],
+    actions: ["檢視架構圖", "進入商品中心", "申請賣家資格"],
+  },
+  "/products": {
+    headline: "Product Center · Direct Listing",
+    points: [
+      "廠家直接上架產線商品",
+      "代理商上架授權商品",
+      "經銷商上架通路商品",
+      "支援圖檔、規格、MOQ、報價",
+      "上架後同步至 Marketplace",
+    ],
+    actions: ["立即上架", "管理我的商品", "查看審核狀態"],
   },
   "/dashboard": {
     headline: "AI Dashboard",
