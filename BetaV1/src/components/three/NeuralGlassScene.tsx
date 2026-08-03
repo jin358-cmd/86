@@ -20,10 +20,11 @@ function VrLookRig({ look }: { look: MutableRefObject<Look> }) {
   const pitch = useRef(0.02);
 
   useFrame(() => {
-    yaw.current = THREE.MathUtils.lerp(yaw.current, look.current.x * 1.05, 0.07);
+    // Inverted mouse look for panoramic VR
+    yaw.current = THREE.MathUtils.lerp(yaw.current, -look.current.x * 1.05, 0.07);
     pitch.current = THREE.MathUtils.lerp(
       pitch.current,
-      look.current.y * 0.28,
+      -look.current.y * 0.28,
       0.07,
     );
     // Rooftop-high vantage like the reference, facing the skyline

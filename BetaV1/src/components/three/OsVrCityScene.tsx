@@ -29,10 +29,11 @@ function VrLookRig({ look }: { look: MutableRefObject<Look> }) {
   const pitch = useRef(0);
 
   useFrame(() => {
-    yaw.current = THREE.MathUtils.lerp(yaw.current, look.current.x * 1.1, 0.07);
+    // Inverted mouse look for panoramic VR
+    yaw.current = THREE.MathUtils.lerp(yaw.current, -look.current.x * 1.1, 0.07);
     pitch.current = THREE.MathUtils.lerp(
       pitch.current,
-      look.current.y * 0.3,
+      -look.current.y * 0.3,
       0.07,
     );
     camera.position.set(0, 16, 10);
