@@ -42,13 +42,31 @@ export function BootScene() {
             ))}
           </AnimatePresence>
         </ul>
-        <div className="mt-8 h-1 overflow-hidden rounded-full bg-gvg-panel">
-          <motion.div
-            className="h-full bg-gvg-yellow"
-            initial={{ width: "0%" }}
-            animate={{ width: `${(visible / BOOT_LINES.length) * 100}%` }}
-            transition={{ ease: "easeOut", duration: 0.35 }}
-          />
+        <div className="mt-8">
+          <div className="mb-2 flex items-baseline justify-between font-mono text-[11px] tracking-[0.22em] text-gvg-yellow md:text-xs">
+            <span>BOOT PROGRESS</span>
+            <motion.span
+              key={visible}
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: 1 }}
+              className="tabular-nums"
+            >
+              {Math.round((visible / BOOT_LINES.length) * 100)}%
+              <span className="ml-2 text-gvg-muted">
+                {visible}/{BOOT_LINES.length}
+              </span>
+            </motion.span>
+          </div>
+          <div className="h-1 overflow-hidden rounded-full bg-gvg-panel">
+            <motion.div
+              className="h-full bg-gvg-yellow"
+              initial={{ width: "0%" }}
+              animate={{
+                width: `${(visible / BOOT_LINES.length) * 100}%`,
+              }}
+              transition={{ ease: "easeOut", duration: 0.35 }}
+            />
+          </div>
         </div>
       </div>
     </section>
