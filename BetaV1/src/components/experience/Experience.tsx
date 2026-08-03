@@ -10,7 +10,6 @@ import {
   useExperience,
 } from "@/hooks/useExperience";
 import { useLenis } from "@/hooks/useLenis";
-import { BootScene } from "@/sections/BootScene";
 import {
   NeuralGlassBackground,
   NeuralGlassSceneSection,
@@ -50,7 +49,7 @@ function StartGate() {
           INITIALIZE
         </button>
         <p className="mt-4 font-mono text-[10px] tracking-wider text-gvg-muted">
-          AUDIO + VISUAL SYSTEMS WILL ENGAGE
+          NEXT · WEAR → VR OPTICS
         </p>
       </div>
     </div>
@@ -78,14 +77,14 @@ function SceneStage() {
             transitioning ? "pointer-events-none opacity-40 blur-sm" : ""
           }
         >
-          {/* Persist VR Night City under Optics + Wear so LINK sits in front */}
-          {(scene === "neuralGlass" || scene === "wear") && (
+          {/* VR Night City only after WEAR completes */}
+          {scene === "neuralGlass" && (
             <div className="fixed inset-0 z-0">
               <NeuralGlassBackground />
             </div>
           )}
 
-          {(scene === "boot" || scene === "login") && <FloatingDust />}
+          {(scene === "wear" || scene === "login") && <FloatingDust />}
           <AnimatePresence mode="wait">
             <motion.div
               key={scene}
@@ -95,7 +94,6 @@ function SceneStage() {
               transition={{ duration: 0.4 }}
               className="relative z-10"
             >
-              {scene === "boot" && <BootScene />}
               {scene === "wear" && (
                 <WearScene onJackInEffects={onJackInEffects} />
               )}

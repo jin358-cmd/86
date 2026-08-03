@@ -29,7 +29,7 @@ export function ChromeHud() {
     setNavOpen(false);
   }, [scene]);
 
-  if (!started || scene === "boot") return null;
+  if (!started) return null;
 
   const isOs = scene === "dashboard";
 

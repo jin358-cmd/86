@@ -45,7 +45,8 @@ type ExperienceContextValue = {
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 
 export function ExperienceProvider({ children }: { children: ReactNode }) {
-  const [scene, setScene] = useState<SceneId>("boot");
+  // After INITIALIZE, first program is WEAR → then VR Optics
+  const [scene, setScene] = useState<SceneId>("wear");
   const [started, setStarted] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [selectedMission, setSelectedMission] = useState<MissionId | null>(
@@ -73,7 +74,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     if (!canSkip(scene)) return;
     playTone("ui");
     // Skip cinematic prologue → world intro
-    if (scene === "boot" || scene === "neuralGlass" || scene === "wear") {
+    if (scene === "neuralGlass" || scene === "wear") {
       goTo("login");
       return;
     }

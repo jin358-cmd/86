@@ -1,5 +1,4 @@
 export const SCENES = [
-  "boot",
   "wear",
   "neuralGlass",
   "login",
@@ -15,8 +14,7 @@ export const SCENE_META: Record<
   SceneId,
   { label: string; autoAdvanceMs?: number }
 > = {
-  // Boot advances itself into WEAR when progress hits 100%
-  boot: { label: "BOOT", autoAdvanceMs: undefined },
+  // INITIALIZE → WEAR → VR Optics
   wear: { label: "LINK", autoAdvanceMs: undefined },
   neuralGlass: { label: "OPTICS", autoAdvanceMs: 7000 },
   login: { label: "LOGIN", autoAdvanceMs: 4500 },
