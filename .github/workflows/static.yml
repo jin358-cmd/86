@@ -32,6 +32,7 @@ jobs:
           cache-dependency-path: |
             V1/package-lock.json
             V2/package-lock.json
+            Beta1/package-lock.json
 
       - name: Install V1
         working-directory: V1
@@ -53,14 +54,25 @@ jobs:
         env:
           PAGES_BASE_PATH: /86/v2
 
+      - name: Install Beta1
+        working-directory: Beta1
+        run: npm ci
+
+      - name: Build Beta1 (/86/beta1)
+        working-directory: Beta1
+        run: npm run build
+        env:
+          PAGES_BASE_PATH: /86/beta1
+
       - name: Assemble multi-version site
         run: |
           rm -rf site
-          mkdir -p site/v1 site/v2
+          mkdir -p site/v1 site/v2 site/beta1
           cp site-hub/index.html site/index.html
           cp -R V1/out/. site/v1/
           cp -R V2/out/. site/v2/
-          ls -la site site/v1 site/v2 | head -40
+          cp -R Beta1/out/. site/beta1/
+          ls -la site site/v1 site/v2 site/beta1 | head -50
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

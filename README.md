@@ -6,10 +6,20 @@
 
 | 版本 | 資料夾 | 說明 | 本機指令 |
 |------|--------|------|----------|
-| **V1** | [`V1/`](./V1) | Neural Link 電影級體驗 | `cd V1 && npm install && npm run dev` |
-| **V2** | [`V2/`](./V2) | 商城／淺色 cyberpunk 平台快照 | `cd V2 && npm install && npm run dev` |
+| **Beta1**（主動開發） | [`Beta1/`](./Beta1) | Beta 第1版：入口 + 平台／商城骨架 | `cd Beta1 && npm install && npm run dev` |
+| **V1** | [`V1/`](./V1) | Neural Link 電影級體驗（封存） | `cd V1 && npm install && npm run dev` |
+| **V2** | [`V2/`](./V2) | 商城／淺色 cyberpunk 快照（封存） | `cd V2 && npm install && npm run dev` |
 
 本機預設：http://localhost:3000（不需 `/86` 前綴）
+
+### Windows 範例（Beta1）
+
+```powershell
+cd F:\@Jin\86-main\Beta1
+git pull
+npm install
+npm run dev
+```
 
 ### Windows 範例（V1）
 
@@ -34,6 +44,7 @@ npm run dev
 | 頁面 | 連結 |
 |------|------|
 | **版本總覽 Hub** | https://jin358-cmd.github.io/86/ |
+| **Beta1（主動）** | https://jin358-cmd.github.io/86/beta1/ |
 | **V1 Neural Link** | https://jin358-cmd.github.io/86/v1/ |
 | **V2 Marketplace** | https://jin358-cmd.github.io/86/v2/ |
 
@@ -41,13 +52,14 @@ npm run dev
 
 ```
 86/
-├── V1/           # 版本 1 完整專案（獨立 npm / Next app）
-├── V2/           # 版本 2 完整專案（獨立 npm / Next app）
+├── Beta1/        # Beta 第1版（主動開發）
+├── V1/           # 版本 1 封存
+├── V2/           # 版本 2 封存
 ├── site-hub/     # Pages 根目錄版本選擇頁
-└── .github/workflows/static.yml  # 同時建置並部署 V1 + V2
+└── .github/workflows/static.yml
 ```
 
 ## GitHub
 
 - Repo: https://github.com/jin358-cmd/86
-- 預設分支 `main` push 後自動部署上述三個網址
+- 預設分支 `main` push 後自動部署上述網址
