@@ -51,8 +51,8 @@ export function NeuralGlassSceneSection() {
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-5 pb-10 md:px-8 md:pb-12">
         <p className="mb-3 max-w-lg font-body text-sm text-white/60 md:text-[15px]">
-          Full-field Neural Link view — no frame occlusion. Move the cursor to
-          look across the night megacity skyline.
+          Full-field Neural Link view — neon towers, holo ads, monorail lanes,
+          and canyon haze. Move the cursor to look across the night megacity.
         </p>
         <ul className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] tracking-wider">
           <AnimatePresence>
